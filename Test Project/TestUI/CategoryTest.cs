@@ -21,7 +21,8 @@ namespace StockTest
             Thread.Sleep(1000);
 
             // Chỉ điền mô tả, bỏ trống Tên (Name)
-            driver.FindElement(By.Name("Name")).Clear();
+            IWebElement nameInput = driver.FindElement(By.Name("Name"));
+            nameInput.Clear();
             driver.FindElement(By.Name("Description")).SendKeys("Cố tình không nhập tên để test validation.");
 
             // Bấm Lưu
@@ -30,9 +31,19 @@ namespace StockTest
 
             try
             {
-                // Kiểm tra xem có xuất hiện câu thông báo lỗi cho trường Name không
-                IWebElement errorSpan = driver.FindElement(By.CssSelector("span[data-valmsg-for='Name']"));
-                Console.WriteLine($"      -> [Pass] Giao diện đã chặn lại. Thông báo lỗi: {errorSpan.Text}");
+                // CÁCH MỚI: Đọc câu thông báo lỗi popup của trình duyệt (HTML5 Validation)
+                string validationMessage = nameInput.GetAttribute("validationMessage");
+
+                if (!string.IsNullOrEmpty(validationMessage))
+                {
+                    Console.WriteLine($"      -> [Pass] Trình duyệt (HTML5) đã chặn lại thành công. Thông báo: {validationMessage}");
+                }
+                else
+                {
+                    // Nếu không có lỗi HTML5, tìm thẻ span báo lỗi của Backend (phòng hờ trường hợp thuộc tính required bị xóa)
+                    IWebElement errorSpan = driver.FindElement(By.CssSelector("span[data-valmsg-for='Name']"));
+                    Console.WriteLine($"      -> [Pass] Backend đã chặn lại. Thông báo lỗi: {errorSpan.Text}");
+                }
             }
             catch (NoSuchElementException)
             {
