@@ -23,19 +23,21 @@ namespace StockTest
                 //Trần Viết Hải ]
                 //==============
                 LoginTest.PerformLogin(driver);
-                // StockIndexTest.RunAllTests(driver);
-                // PurchaseTest.RunAllTests(driver);
-                // SupplierTest.RunAllTests(driver);
+                //StockIndexTest.RunAllTests(driver);
+                //PurchaseTest.RunAllTests(driver);
+                //SupplierTest.RunAllTests(driver);
 
                 //================
                 //Lê Thị Thúy Nhi]
                 //================
+                //ProductTest.RunAllTests(driver);
 
-                ProductTest.RunAllTests(driver);
-
-                // Sau này bạn có thêm trang thì cứ gọi tiếp:
-                // ProductTest.RunAllTests(driver);
-                // OrderTest.RunAllTests(driver);
+                //================
+                //Nguyễn Bá Thịnh]
+                //================
+                CategoryTest.RunAllTests(driver);
+                UnitTest.RunAllTests(driver);
+                BrandTest.RunAllTests(driver);
 
                 Console.WriteLine("\n=== ĐÃ HOÀN THÀNH TOÀN BỘ TEST CASES ===");
             }

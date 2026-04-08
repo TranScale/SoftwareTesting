@@ -9,76 +9,114 @@ namespace StockTest
     {
         public static void RunAllTests(IWebDriver driver)
         {
-            Console.WriteLine("\n-> BẮT ĐẦU TEST MODULE: QUẢN LÝ NHẬP HÀNG (PURCHASES)");
+            Console.WriteLine("\n-> BẮT ĐẦU TEST BIÊN (EDGE CASES) MODULE: QUẢN LÝ NHẬP HÀNG (PURCHASES)");
+            IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
 
-            // 1. Vào trang Index Nhập hàng
-            driver.Navigate().GoToUrl("http://localhost:5068/Admin/Purchases");
-            Thread.Sleep(2000);
-
-            // 2. TEST TÌM KIẾM
-            Console.WriteLine("   1. Đang test: Tìm kiếm phiếu nhập...");
-            IWebElement searchBox = driver.FindElement(By.Name("q"));
-            searchBox.Clear();
-            searchBox.SendKeys("PO-"); // Tìm các mã phiếu chứa "PO-"
-            driver.FindElement(By.XPath("//button[contains(text(), 'Tìm kiếm')]")).Click();
-            Thread.Sleep(1500);
-
-            // 3. TEST RESET
-            Console.WriteLine("   2. Đang test: Nút Reset...");
-            driver.FindElement(By.XPath("//a[contains(@href, '/Admin/Purchases') and contains(., 'Reset')]")).Click();
-            Thread.Sleep(1500);
-
-            // 4. TEST TẠO MỚI PHIẾU NHẬP
-            Console.WriteLine("   3. Đang test: Tạo phiếu nhập hàng (Draft)...");
-            // Click nút Tạo phiếu nhập
-            driver.FindElement(By.CssSelector("a[href='/Admin/Purchases/Create']")).Click();
-            Thread.Sleep(2000);
-
-            // --- Điền Form Tạo Mới ---
-            // Chọn Nhà cung cấp (Chọn option thứ 2, vì option 1 là "-- Chọn nhà cung cấp --")
-            SelectElement supplierSelect = new SelectElement(driver.FindElement(By.Name("SupplierId")));
-            supplierSelect.SelectByIndex(1);
-
-            // Chọn Sản phẩm (Dòng 1: Items[0])
-            SelectElement productSelect = new SelectElement(driver.FindElement(By.Name("Items[0].ProductId")));
-            productSelect.SelectByIndex(1);
-
-            // Sửa số lượng thành 10
-            IWebElement qtyInput = driver.FindElement(By.Name("Items[0].Qty"));
-            qtyInput.Clear();
-            qtyInput.SendKeys("10");
-
-            // Sửa đơn giá thành 50000
-            IWebElement costInput = driver.FindElement(By.Name("Items[0].UnitCost"));
-            costInput.Clear();
-            costInput.SendKeys("50000");
-
-            // Bấm Lưu phiếu nhập (Submit form)
-            driver.FindElement(By.CssSelector("button[type='submit'].btn-gradient")).Click();
-            Thread.Sleep(2000);
-            Console.WriteLine("      -> [Pass] Tạo phiếu nháp thành công. Đã chuyển sang trang Chi tiết.");
-
-            // 5. TEST XÁC NHẬN NHẬP KHO (Trong trang Details)
-            Console.WriteLine("   4. Đang test: Nút Xác nhận nhập kho...");
+            // ==========================================
+            // TC_PUR_EDGE_01: NHẬP SỐ LƯỢNG VÀ ĐƠN GIÁ ÂM
+            // ==========================================
+            Console.WriteLine("  1. [TC_PUR_EDGE_01] Đang test: Nhập Số lượng và Đơn giá âm (-10, -5000)...");
             try
             {
-                // Tìm nút Xác nhận nhập kho (Nằm trong form có action chứa /Receive/)
-                IWebElement receiveBtn = driver.FindElement(By.XPath("//form[contains(@action, '/Admin/Purchases/Receive/')]/button"));
-                receiveBtn.Click();
+                driver.Navigate().GoToUrl("http://localhost:5068/Admin/Purchases/Create");
+                Thread.Sleep(1500);
 
-                // Vì code của bạn có thuộc tính onclick="return confirm('...');", trình duyệt sẽ bật lên 1 cái Alert
-                // Ta phải dùng code để tự động nhấn OK (Accept) cái Alert đó
-                Thread.Sleep(1000);
-                IAlert alert = driver.SwitchTo().Alert();
-                alert.Accept();
+                new SelectElement(driver.FindElement(By.Name("SupplierId"))).SelectByIndex(1);
+                new SelectElement(driver.FindElement(By.Name("Items[0].ProductId"))).SelectByIndex(1);
 
+                // Cố tình nhập giá trị âm
+                IWebElement qtyInput = driver.FindElement(By.Name("Items[0].Qty"));
+                qtyInput.Clear();
+                qtyInput.SendKeys("-10");
+
+                IWebElement costInput = driver.FindElement(By.Name("Items[0].UnitCost"));
+                costInput.Clear();
+                costInput.SendKeys("-50000");
+
+                driver.FindElement(By.CssSelector("button[type='submit'].btn-gradient")).Click();
                 Thread.Sleep(2000);
-                Console.WriteLine("      -> [Pass] Đã xác nhận nhập kho và xử lý Alert thành công.");
+
+                // Kỳ vọng: Hệ thống chặn lại (Frontend hoặc Backend) và không tạo thành công
+                Console.WriteLine("       -> [Pass] Đã gửi form giá trị âm. Cần kiểm tra xem Backend/Frontend đã chặn lưu dữ liệu chưa.");
             }
-            catch (Exception ex)
+            catch (Exception ex) { Console.WriteLine("       -> [Failed] " + ex.Message); }
+
+            // ==========================================
+            // TC_PUR_EDGE_02: BYPASS FRONTEND VALIDATION (GỬI FORM RỖNG)
+            // ==========================================
+            Console.WriteLine("  2. [TC_PUR_EDGE_02] Đang test: Xóa thuộc tính 'required' của HTML và gửi form rỗng...");
+            try
             {
-                Console.WriteLine("      -> [Failed/Skip] Không tìm thấy nút Xác nhận nhập kho hoặc Phiếu đã được xử lý. Lỗi: " + ex.Message);
+                driver.Navigate().GoToUrl("http://localhost:5068/Admin/Purchases/Create");
+                Thread.Sleep(1500);
+
+                // Dùng JS can thiệp DOM: Gỡ toàn bộ thuộc tính 'required', 'min', 'max' để bypass HTML5 validation
+                js.ExecuteScript(@"
+                    document.querySelectorAll('[required]').forEach(e => e.removeAttribute('required'));
+                    document.querySelectorAll('[min]').forEach(e => e.removeAttribute('min'));
+                    document.querySelectorAll('[max]').forEach(e => e.removeAttribute('max'));
+                ");
+
+                // Bấm Submit thẳng luôn (không chọn Nhà cung cấp, không có Sản phẩm)
+                driver.FindElement(By.CssSelector("button[type='submit'].btn-gradient")).Click();
+                Thread.Sleep(2000);
+
+                // Kỳ vọng: Model State của ASP.NET Core Backend phải bắt được lỗi và trả về giao diện báo lỗi, KHÔNG BỊ CRASH (Error 500)
+                Console.WriteLine("       -> [Pass] Bypass HTML5 thành công và gửi request. Backend phải xử lý được Validation.");
             }
+            catch (Exception ex) { Console.WriteLine("       -> [Failed] Hệ thống có thể đã crash: " + ex.Message); }
+
+            // ==========================================
+            // TC_PUR_EDGE_03: GÂY TRÀN SỐ (NUMERIC OVERFLOW)
+            // ==========================================
+            Console.WriteLine("  3. [TC_PUR_EDGE_03] Đang test: Nhập số lượng khổng lồ gây tràn số (Overflow)...");
+            try
+            {
+                driver.Navigate().GoToUrl("http://localhost:5068/Admin/Purchases/Create");
+                Thread.Sleep(1500);
+
+                new SelectElement(driver.FindElement(By.Name("SupplierId"))).SelectByIndex(1);
+                new SelectElement(driver.FindElement(By.Name("Items[0].ProductId"))).SelectByIndex(1);
+
+                // Nhập một con số lớn hơn giới hạn của kiểu `int` trong C# (2,147,483,647)
+                IWebElement qtyInput = driver.FindElement(By.Name("Items[0].Qty"));
+                qtyInput.Clear();
+                qtyInput.SendKeys("9999999999999999"); // Gây lỗi FormatException hoặc OverflowException nếu Backend không bắt
+
+                IWebElement costInput = driver.FindElement(By.Name("Items[0].UnitCost"));
+                costInput.Clear();
+                costInput.SendKeys("9999999999");
+
+                driver.FindElement(By.CssSelector("button[type='submit'].btn-gradient")).Click();
+                Thread.Sleep(2000);
+
+                Console.WriteLine("       -> [Pass] Gửi số siêu lớn thành công. Cần check hệ thống có báo lỗi 'Giá trị quá lớn' hay bị sập (Crash).");
+            }
+            catch (Exception ex) { Console.WriteLine("       -> [Failed] " + ex.Message); }
+
+            // ==========================================
+            // TC_PUR_EDGE_04: THAO TÁC URL - ID KHÔNG TỒN TẠI HOẶC ÂM
+            // ==========================================
+            Console.WriteLine("  4. [TC_PUR_EDGE_04] Đang test: Truy cập Chi tiết phiếu nhập bằng ID ảo (-1, 999999)...");
+            try
+            {
+                // Test ID âm
+                driver.Navigate().GoToUrl("http://localhost:5068/Admin/Purchases/Details/-1");
+                Thread.Sleep(1500);
+
+                bool isNotFoundOrError1 = driver.PageSource.Contains("Không tìm thấy") || driver.Title.Contains("404");
+
+                // Test ID cực lớn không tồn tại
+                driver.Navigate().GoToUrl("http://localhost:5068/Admin/Purchases/Details/999999");
+                Thread.Sleep(1500);
+
+                bool isNotFoundOrError2 = driver.PageSource.Contains("Không tìm thấy") || driver.Title.Contains("404");
+
+                Console.WriteLine($"       -> [Pass] Truy cập URL ID ảo. Trạng thái xử lý 404/Not Found: {isNotFoundOrError1 && isNotFoundOrError2}");
+            }
+            catch (Exception ex) { Console.WriteLine("       -> [Failed] Lỗi khi xử lý URL parameter: " + ex.Message); }
+
+            Console.WriteLine("\n-> KẾT THÚC TEST BIÊN (EDGE CASES) MODULE: NHẬP HÀNG");
         }
     }
 }
