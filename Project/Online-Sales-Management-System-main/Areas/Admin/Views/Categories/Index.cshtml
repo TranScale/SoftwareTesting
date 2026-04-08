@@ -1,0 +1,182 @@
+﻿@model List<OnlineSalesManagementSystem.Domain.Entities.Category>
+@using Microsoft.AspNetCore.Authorization
+@using OnlineSalesManagementSystem.Services.Security
+@inject IAuthorizationService AuthorizationService
+
+@{
+    ViewData["Title"] = "Quản lý Danh mục";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    string q = ViewBag.Query as string ?? "";
+    int page = (int)(ViewBag.Page ?? 1);
+    int pageSize = (int)(ViewBag.PageSize ?? 10);
+    int total = (int)(ViewBag.Total ?? 0);
+    int totalPages = pageSize <= 0 ? 0 : (int)Math.Ceiling(total / (double)pageSize);
+    bool hasPrev = page > 1;
+    bool hasNext = page < totalPages;
+    int start = (page - 1) * pageSize + (total == 0 ? 0 : 1);
+    int end = Math.Min(page * pageSize, total);
+}
+
+<link rel="stylesheet" href="~/css/categories-index.css" />
+
+<div id="toast-container"></div>
+
+<div class="container-fluid py-4" style="background-color: #f8f9fc;">
+    <div class="hero-header">
+        <i class="fas fa-layer-group hero-icon-bg"></i>
+        <div style="z-index: 1;">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-custom mb-2">
+                    <li class="breadcrumb-item"><a href="/Admin/Home"><i class="fas fa-home me-1"></i>Trang chủ</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Danh mục</li>
+                </ol>
+            </nav>
+
+            <div class="d-flex align-items-center gap-3">
+                <h2 class="fw-bold text-dark mb-0">Quản lý Danh mục</h2>
+                <span class="stat-badge">
+                    <i class="fas fa-cube"></i> @(Model != null ? Model.Count() : 0) mục
+                </span>
+            </div>
+            <p class="text-muted mt-2 mb-0" style="max-width: 600px;">
+                Quản lý, phân loại và sắp xếp các nhóm sản phẩm hiển thị trên cửa hàng.
+            </p>
+        </div>
+
+        <div style="z-index: 1;">
+            <a href="/Admin/Categories/Create" class="btn btn-gradient shadow-lg px-4 py-3 rounded-pill d-flex align-items-center gap-2">
+                <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 24px; height: 24px;">
+                    <i class="fas fa-plus fa-xs"></i>
+                </div>
+                <span class="fw-bold">Tạo mới</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="card card-modern">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-modern mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-4 text-center" style="width: 80px;">ID</th>
+                            <th>Tên danh mục</th>
+                            <th>Mô tả</th>
+                            <th class="text-center" style="width: 150px;">Trending</th>
+                            <th class="text-end pe-5" style="width: 160px;">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4 text-center">
+                                        <span class="id-badge">#@item.Id</span>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold text-dark" style="font-size: 1rem;">@item.Name</span>
+                                    </td>
+                                    <td class="text-muted">
+                                        @(item.Description?.Length > 50 ? item.Description.Substring(0, 50) + "..." : item.Description)
+                                    </td>
+                                    <td class="text-center">
+                                        <label class="toggle-switch" title="Bật/Tắt Trending">
+                                            <input type="checkbox" onchange="toggleTrending(@item.Id, this)" @(item.IsTrending ? "checked" : "")>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </td>
+                                    <td class="text-end pe-5">
+                                        <a href="/Admin/Categories/Edit/@item.Id" class="btn btn-icon edit me-2" title="Chỉnh sửa">
+                                            <i class="fas fa-pen fa-xs"></i>
+                                        </a>
+                                        <form method="post" action="/Admin/Categories/Delete/@item.Id" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa danh mục này?');">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-icon delete" title="Xóa">
+                                                <i class="fas fa-trash fa-xs"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted opacity-50">
+                                        <i class="fas fa-folder-open fa-3x mb-3"></i>
+                                        <p>Chưa có dữ liệu danh mục nào.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3 p-3">
+                <div class="text-muted small">
+                    Showing @start to @end of @total entries
+                </div>
+
+                <nav aria-label="Categories pagination">
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item @(hasPrev ? "" : "disabled")">
+                            <a class="page-link" href="@BuildUrl(page - 1)">Prev</a>
+                        </li>
+                        @{
+                            int s = Math.Max(1, page - 2);
+                            int e = Math.Min(totalPages, page + 2);
+                            for (int i = s; i <= e; i++)
+                            {
+                                <li class="page-item @(i == page ? "active" : "")">
+                                    <a class="page-link" href="@BuildUrl(i)">@i</a>
+                                </li>
+                            }
+                        }
+                        <li class="page-item @(hasNext ? "" : "disabled")">
+                            <a class="page-link" href="@BuildUrl(page + 1)">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    private string BuildUrl(int page)
+    {
+        if (page < 1) page = 1;
+        string q = ViewBag.Query as string ?? "";
+        int pageSize = (int)(ViewBag.PageSize ?? 10);
+        return $"/Admin/Categories?q={Uri.EscapeDataString(q)}&page={page}&pageSize={pageSize}";
+    }
+}
+
+@section Scripts {
+    <script>
+        function toggleTrending(id, el) {
+            el.disabled = true;
+
+            fetch('/Admin/Categories/ToggleTrending/' + id, window.osms.postOptions())
+                .then(async r => {
+                    const data = await r.json().catch(() => ({ success: false }));
+                    if (!r.ok || !data.success) {
+                        throw new Error(data.message || 'Cập nhật thất bại');
+                    }
+                })
+                .catch(e => {
+                    console.error(e);
+                    el.checked = !el.checked;
+                    alert('Cập nhật thất bại');
+                })
+                .finally(() => {
+                    el.disabled = false;
+                });
+        }
+    </script>
+}

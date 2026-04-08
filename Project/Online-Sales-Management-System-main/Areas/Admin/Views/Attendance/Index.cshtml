@@ -1,0 +1,105 @@
+﻿@model List<OnlineSalesManagementSystem.Domain.Entities.Attendance>
+@using OnlineSalesManagementSystem.Domain.Entities
+@{
+    ViewData["Title"] = "Attendance History";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    string from = ViewBag.From as string ?? "";
+    string to = ViewBag.To as string ?? "";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1 text-dark">Attendance</h1>
+            <p class="text-muted small mb-0">Manage employee attendance records.</p>
+        </div>
+        <a class="btn btn-primary shadow-sm" href="/Admin/Attendance/Mark">
+            <i class="fas fa-calendar-check me-2"></i>Mark Attendance
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4">
+            <form method="get" class="row g-3 align-items-end mb-4 bg-light p-3 rounded-3 mx-0">
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-secondary text-uppercase">From Date</label>
+                    <input class="form-control" type="date" name="from" value="@from" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-secondary text-uppercase">To Date</label>
+                    <input class="form-control" type="date" name="to" value="@to" />
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button class="btn btn-primary w-100 fw-bold" type="submit">
+                        <i class="fas fa-filter me-1"></i> Filter
+                    </button>
+                    <a class="btn btn-outline-secondary w-50" href="/Admin/Attendance" title="Reset">
+                        <i class="fas fa-undo"></i>
+                    </a>
+                </div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-3 border-0 rounded-start text-secondary text-uppercase small fw-bold" style="width:80px;">#</th>
+                            <th class="border-0 text-secondary text-uppercase small fw-bold" style="width:160px;">Date</th>
+                            <th class="border-0 text-secondary text-uppercase small fw-bold">Employee</th>
+                            <th class="border-0 text-secondary text-uppercase small fw-bold" style="width:150px;">Status</th>
+                            <th class="border-0 rounded-end text-secondary text-uppercase small fw-bold">Note</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-5">
+                                    <i class="fas fa-clipboard-list fa-2x mb-3 text-secondary opacity-50"></i>
+                                    <p class="mb-0">No attendance records found within this period.</p>
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var a in Model)
+                            {
+                                // Logic màu sắc Badge hiện đại hơn
+                                string badgeClass = a.Status switch
+                                {
+                                    AttendanceStatus.Present => "bg-success bg-opacity-10 text-success border border-success border-opacity-25",
+                                    AttendanceStatus.Absent => "bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25",
+                                    AttendanceStatus.Late => "bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25",
+                                    AttendanceStatus.Leave => "bg-info bg-opacity-10 text-info border border-info border-opacity-25",
+                                    _ => "bg-secondary bg-opacity-10 text-secondary"
+                                };
+
+                                <tr>
+                                    <td class="ps-3 text-muted small">@a.Id</td>
+                                    <td class="fw-medium text-dark">@a.Date.ToString("MMM dd, yyyy")</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle bg-primary bg-opacity-10 text-primary me-2 rounded-circle d-flex align-items-center justify-content-center" style="width:32px; height:32px; font-size:12px; font-weight:bold;">
+                                                @(a.Employee?.Name?.Substring(0, 1) ?? "U")
+                                            </div>
+                                            <span class="fw-bold text-dark">@a.Employee?.Name</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge rounded-pill px-3 py-2 fw-bold @badgeClass">@a.Status</span>
+                                    </td>
+                                    <td class="text-muted small">@a.Note</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-3 small text-muted text-end fst-italic">
+                * Showing latest 500 records.
+            </div>
+        </div>
+    </div>
+</div>

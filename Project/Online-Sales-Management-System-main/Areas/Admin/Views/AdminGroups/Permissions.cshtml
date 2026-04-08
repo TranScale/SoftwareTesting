@@ -1,0 +1,202 @@
+================================================================================
+@model OnlineSalesManagementSystem.Areas.Admin.Controllers.AdminGroupsController.GroupPermissionsVm
+@using OnlineSalesManagementSystem.Services.Security
+
+@{
+    ViewData["Title"] = "Group Permissions";
+
+    bool isSuperGroup = string.Equals(Model.GroupName?.Trim(), SuperAdminProtection.SuperAdminGroupName, StringComparison.OrdinalIgnoreCase);
+    string? disabled = isSuperGroup ? "disabled" : null;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h3 class="mb-0">Permissions</h3>
+        <div class="text-muted">
+            Group: <strong>@Model.GroupName</strong>
+            @if (isSuperGroup)
+            {
+                <span class="badge badge-secondary ml-2"><i class="fas fa-lock"></i> Read-only</span>
+            }
+        </div>
+    </div>
+
+    <a class="btn btn-outline-secondary" asp-area="Admin" asp-controller="AdminGroups" asp-action="Index">
+        <i class="fas fa-arrow-left"></i> Back
+    </a>
+</div>
+
+@if (isSuperGroup)
+{
+    <div class="alert alert-warning">
+        This is the <strong>Super Admin</strong> group. You can view permissions, but saving is locked.
+    </div>
+}
+
+<form method="post" asp-area="Admin" asp-controller="AdminGroups" asp-action="Permissions">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="GroupId" />
+    <input type="hidden" asp-for="GroupName" />
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+
+            <div class="custom-control custom-switch mb-3">
+                <input type="checkbox" class="custom-control-input" id="grantAll" asp-for="GrantAll" disabled="@disabled" />
+                <label class="custom-control-label" for="grantAll">
+                    Grant all permissions (wildcard)
+                </label>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm mb-0" id="permTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th style="min-width: 180px;">Module</th>
+
+                            <th class="text-center">
+                                <input type="checkbox" class="toggle-all" data-col="show" disabled="@disabled" />
+                                <div class="small">Show</div>
+                            </th>
+                            <th class="text-center">
+                                <input type="checkbox" class="toggle-all" data-col="create" disabled="@disabled" />
+                                <div class="small">Create</div>
+                            </th>
+                            <th class="text-center">
+                                <input type="checkbox" class="toggle-all" data-col="edit" disabled="@disabled" />
+                                <div class="small">Edit</div>
+                            </th>
+                            <th class="text-center">
+                                <input type="checkbox" class="toggle-all" data-col="delete" disabled="@disabled" />
+                                <div class="small">Delete</div>
+                            </th>
+                            <th class="text-center">
+                                <input type="checkbox" class="toggle-all" data-col="approve" disabled="@disabled" />
+                                <div class="small">Approve</div>
+                            </th>
+                            <th class="text-center">
+                                <input type="checkbox" class="toggle-all" data-col="export" disabled="@disabled" />
+                                <div class="small">Export</div>
+                            </th>
+
+                            <th class="text-center" style="width:110px;">Row</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @for (int i = 0; i < Model.Rows.Count; i++)
+                    {
+                        <tr>
+                            <td>
+                                <input type="hidden" asp-for="Rows[i].Module" />
+                                <strong>@Model.Rows[i].Module</strong>
+                            </td>
+
+                            <td class="text-center">
+                                <input type="checkbox" asp-for="Rows[i].Show" class="col-show perm-check" disabled="@disabled" />
+                            </td>
+                            <td class="text-center">
+                                <input type="checkbox" asp-for="Rows[i].Create" class="col-create perm-check" disabled="@disabled" />
+                            </td>
+                            <td class="text-center">
+                                <input type="checkbox" asp-for="Rows[i].Edit" class="col-edit perm-check" disabled="@disabled" />
+                            </td>
+                            <td class="text-center">
+                                <input type="checkbox" asp-for="Rows[i].Delete" class="col-delete perm-check" disabled="@disabled" />
+                            </td>
+                            <td class="text-center">
+                                <input type="checkbox" asp-for="Rows[i].Approve" class="col-approve perm-check" disabled="@disabled" />
+                            </td>
+                            <td class="text-center">
+                                <input type="checkbox" asp-for="Rows[i].Export" class="col-export perm-check" disabled="@disabled" />
+                            </td>
+
+                            <td class="text-center">
+                                <button type="button" class="btn btn-sm btn-outline-secondary row-check" data-row="@i" disabled="@disabled">
+                                    Toggle row
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+        <div class="card-footer bg-white d-flex justify-content-end">
+            @if (!isSuperGroup)
+            {
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save
+                </button>
+            }
+            else
+            {
+                <button type="button" class="btn btn-secondary" disabled>
+                    <i class="fas fa-lock"></i> Save locked
+                </button>
+            }
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+<script>
+(function () {
+    const isReadOnly = @isSuperGroup.ToString().ToLowerInvariant();
+    if (isReadOnly) return;
+
+    const grantAll = document.getElementById('grantAll');
+    const permChecks = document.querySelectorAll('.perm-check');
+    const rowBtns = document.querySelectorAll('.row-check');
+    const colToggles = document.querySelectorAll('.toggle-all');
+
+    function setDisabledForMatrix(disabled) {
+        permChecks.forEach(cb => cb.disabled = disabled);
+        rowBtns.forEach(b => b.disabled = disabled);
+        colToggles.forEach(cb => cb.disabled = disabled);
+    }
+
+    function setAllChecks(checked) {
+        permChecks.forEach(cb => cb.checked = checked);
+        colToggles.forEach(cb => cb.checked = checked);
+    }
+
+    // GrantAll -> disable matrix
+    function syncGrantAll() {
+        if (grantAll.checked) {
+            setAllChecks(true);
+            setDisabledForMatrix(true);
+        } else {
+            setDisabledForMatrix(false);
+        }
+    }
+
+    grantAll.addEventListener('change', syncGrantAll);
+    syncGrantAll();
+
+    // Toggle a whole column
+    colToggles.forEach(tg => {
+        tg.addEventListener('change', function () {
+            const col = this.dataset.col;
+            document.querySelectorAll('.col-' + col).forEach(cb => cb.checked = tg.checked);
+        });
+    });
+
+    // Toggle row
+    rowBtns.forEach(btn => {
+        btn.addEventListener('click', function () {
+            const rowIndex = parseInt(this.dataset.row);
+            const row = document.querySelectorAll('#permTable tbody tr')[rowIndex];
+            if (!row) return;
+
+            const boxes = row.querySelectorAll('input.perm-check');
+            const allChecked = Array.from(boxes).every(x => x.checked);
+            boxes.forEach(x => x.checked = !allChecked);
+        });
+    });
+})();
+</script>
+}
+ 
+ 

@@ -1,0 +1,20 @@
+@using OnlineSalesManagementSystem.Helpers
+@inject IConfiguration Configuration
+@{
+    var connectionString = Configuration.GetConnectionString("MySqlConnection")
+        ?? Configuration.GetConnectionString("DefaultConnection");
+    var tidbPassword = Configuration["TiDB:Password"];
+
+    if (!string.IsNullOrWhiteSpace(connectionString) && !string.IsNullOrWhiteSpace(tidbPassword))
+    {
+        connectionString = connectionString.Replace("<TIDB_PASSWORD>", tidbPassword, StringComparison.Ordinal);
+    }
+
+    var dbInfo = DatabaseConnectionDisplay.FromConnectionString(connectionString);
+    var badgeClass = dbInfo.IsTiDb ? "badge-success" : "badge-warning";
+    var title = $"Engine: {dbInfo.Engine} | Database: {dbInfo.Database} | Host: {dbInfo.Host}";
+}
+
+<span class="badge @badgeClass" title="@title" style="font-size:0.72rem; padding:0.36rem 0.55rem;">
+    DB: @dbInfo.Engine / @dbInfo.Database
+</span>

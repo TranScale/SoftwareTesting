@@ -1,0 +1,270 @@
+﻿@model OnlineSalesManagementSystem.Areas.Admin.Controllers.PurchasesController.PurchaseCreateVm
+@using OnlineSalesManagementSystem.Domain.Entities
+@{
+    ViewData["Title"] = "Tạo phiếu nhập";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    var suppliers = ViewBag.Suppliers as List<Supplier> ?? new();
+    var products = ViewBag.Products as List<Product> ?? new();
+}
+
+<link rel="stylesheet" href="~/css/purchases-ui.css" />
+
+<div class="container-fluid py-4" style="background-color: #f8f9fc;">
+    <div class="hero-header d-flex justify-content-between align-items-center mb-4">
+        <i class="fas fa-truck-loading hero-icon-bg"></i>
+        <div style="z-index: 1;">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-custom mb-2">
+                    <li class="breadcrumb-item"><a href="/Admin/Purchases">Nhập hàng</a></li>
+                    <li class="breadcrumb-item active">Tạo mới</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold text-dark mb-0">Tạo phiếu nhập hàng</h2>
+        </div>
+        <div style="z-index: 1;">
+            <a href="/Admin/Purchases" class="btn btn-light border rounded-pill px-4 fw-bold text-secondary shadow-sm hover-scale">
+                <i class="fas fa-arrow-left me-2"></i>Quay lại
+            </a>
+        </div>
+    </div>
+
+    <form asp-area="Admin" asp-controller="Purchases" asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="row g-4">
+            <div class="col-12">
+                <div class="card card-modern p-4">
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger shadow-sm border-0 rounded-3 mb-4">
+                            @Html.ValidationSummary(excludePropertyErrors: true)
+                        </div>
+                    }
+
+                    <div class="row g-4">
+                        <div class="col-md-7">
+                            <label class="form-label fw-bold text-muted text-uppercase small">Nhà cung cấp <span class="text-danger">*</span></label>
+
+                            <select class="form-select form-select-lg shadow-none border-secondary-subtle" id="supplierSelect" name="SupplierId" required>
+                                <option value="">-- Chọn nhà cung cấp --</option>
+                                @foreach (var s in suppliers)
+                                {
+                                    var selected = (Model.SupplierId == s.Id) ? "selected" : null;
+                                    /* Đã xóa data-contact để tránh lỗi */
+                                    <option value="@s.Id" selected="@selected"
+                                            data-phone="@(s.Phone ?? "---")"
+                                            data-email="@(s.Email ?? "---")"
+                                            data-address="@(s.Address ?? "---")">
+                                        @s.Name
+                                    </option>
+                                }
+                            </select>
+
+                            <div id="supplierInfoBox" class="supplier-info-box">
+                                <div class="info-row">
+                                    <i class="fas fa-phone-alt"></i>
+                                    <span class="info-label">Điện thoại:</span>
+                                    <span class="info-value" id="displayPhone"></span>
+                                </div>
+                                <div class="info-row">
+                                    <i class="fas fa-envelope"></i>
+                                    <span class="info-label">Email:</span>
+                                    <span class="info-value" id="displayEmail"></span>
+                                </div>
+                                <div class="info-row mb-0">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span class="info-label">Địa chỉ:</span>
+                                    <span class="info-value" id="displayAddress"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-5">
+                            <label class="form-label fw-bold text-muted text-uppercase small">Ngày nhập kho</label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-light border-secondary-subtle"><i class="far fa-calendar-alt text-muted"></i></span>
+                                <input class="form-control fw-bold text-dark" type="date" name="PurchaseDate" value="@Model.PurchaseDate.ToString("yyyy-MM-dd")" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="card card-modern">
+                    <div class="card-header bg-white border-bottom-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="fw-bold mb-1 text-success"><i class="fas fa-boxes me-2"></i>Danh sách hàng hóa</h5>
+                            <div class="text-muted small">Nhập chi tiết số lượng và đơn giá nhập</div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3 fw-bold hover-scale" onclick="addRow()">
+                            <i class="fas fa-plus me-1"></i> Thêm dòng
+                        </button>
+                    </div>
+
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-modern mb-0" id="itemsTable">
+                                <thead>
+                                    <tr>
+                                        <th class="ps-4" style="min-width: 300px;">Sản phẩm</th>
+                                        <th style="width: 150px;" class="text-center">Số lượng</th>
+                                        <th style="width: 200px;" class="text-end">Đơn giá nhập</th>
+                                        <th style="width: 60px;" class="text-center"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        var rows = (Model.Items?.Any() == true) ? Model.Items : new List<OnlineSalesManagementSystem.Areas.Admin.Controllers.PurchasesController.PurchaseItemVm> { new() };
+                                    }
+                                    @for (var i = 0; i < rows.Count; i++)
+                                    {
+                                        <tr>
+                                            <td class="ps-4">
+                                                <select class="form-select table-input" name="Items[@i].ProductId" required>
+                                                    <option value="">-- Chọn sản phẩm --</option>
+                                                    @foreach (var p in products)
+                                                    {
+                                                        var selected = (rows[i].ProductId == p.Id) ? "selected" : null;
+                                                        <option value="@p.Id" selected="@selected">@p.Name (@p.SKU)</option>
+                                                    }
+                                                </select>
+                                            </td>
+                                            <td class="text-center">
+                                                <input class="table-input text-center fw-bold" type="number" min="1" step="1" name="Items[@i].Qty" value="@rows[i].Qty" required />
+                                            </td>
+                                            <td>
+                                                <div class="input-group input-group-sm">
+                                                    <input class="form-control table-input text-end fw-bold" type="number" min="0" step="0.01" name="Items[@i].UnitCost" value="@rows[i].UnitCost" required />
+                                                    <span class="input-group-text bg-white border-start-0 text-muted">đ</span>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-sm text-danger hover-scale" onclick="removeRow(this)">
+                                                    <i class="fas fa-trash-alt fa-lg"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-white border-top border-dashed p-4">
+                        <div class="alert alert-warning mb-0 border-0 rounded-3 d-flex align-items-center shadow-sm">
+                            <i class="fas fa-exclamation-triangle fa-lg me-3 text-warning"></i>
+                            <div>
+                                <strong>Lưu ý quan trọng:</strong> Phiếu này sẽ được tạo ở trạng thái <strong>Nháp (Draft)</strong>.<br />
+                                Bạn cần bấm nút <strong>"Nhập kho" (Receive)</strong> ở màn hình chi tiết để hệ thống cộng tồn kho.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 d-flex justify-content-end gap-3 pb-5">
+                <a class="btn btn-light rounded-pill px-4 border fw-bold" href="/Admin/Purchases">Hủy bỏ</a>
+                <button type="submit" class="btn btn-gradient rounded-pill px-5 shadow fw-bold text-white hover-scale">
+                    <i class="fas fa-save me-2"></i> Lưu phiếu nhập
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        // --- 1. XỬ LÝ HIỂN THỊ THÔNG TIN NHÀ CUNG CẤP ---
+        function initSupplierInfo() {
+            const select = document.getElementById('supplierSelect');
+            const box = document.getElementById('supplierInfoBox');
+
+            // Đã xóa tham chiếu dContact
+            const dPhone = document.getElementById('displayPhone');
+            const dEmail = document.getElementById('displayEmail');
+            const dAddress = document.getElementById('displayAddress');
+
+            function update() {
+                const opt = select.options[select.selectedIndex];
+                if (select.value && opt) {
+                    dPhone.textContent = opt.dataset.phone || '---';
+                    dEmail.textContent = opt.dataset.email || '---';
+                    dAddress.textContent = opt.dataset.address || '---';
+                    box.classList.add('active');
+                } else {
+                    box.classList.remove('active');
+                }
+            }
+
+            select.addEventListener('change', update);
+            update();
+        }
+
+        // --- 2. LOGIC BẢNG HÀNG HÓA ---
+        function reindex() {
+            const tbody = document.querySelector('#itemsTable tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            rows.forEach((tr, idx) => {
+                tr.querySelectorAll('select, input').forEach(el => {
+                    const name = el.getAttribute('name') || '';
+                    el.setAttribute('name', name.replace(/Items\[\d+\]/, `Items[${idx}]`));
+                });
+            });
+        }
+
+        function addRow() {
+            const tbody = document.querySelector('#itemsTable tbody');
+            const idx = tbody.querySelectorAll('tr').length;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="ps-4">
+                    <select class="form-select table-input" name="Items[${idx}].ProductId" required>
+                        <option value="">-- Chọn sản phẩm --</option>
+                        ${getProductOptionsHtml()}
+                    </select>
+                </td>
+                <td class="text-center">
+                    <input class="table-input text-center fw-bold" type="number" min="1" step="1" name="Items[${idx}].Qty" value="1" required />
+                </td>
+                <td>
+                    <div class="input-group input-group-sm">
+                        <input class="form-control table-input text-end fw-bold" type="number" min="0" step="0.01" name="Items[${idx}].UnitCost" value="0" required />
+                        <span class="input-group-text bg-white border-start-0 text-muted">đ</span>
+                    </div>
+                </td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-sm text-danger hover-scale" onclick="removeRow(this)">
+                        <i class="fas fa-trash-alt fa-lg"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        function removeRow(btn) {
+            const tbody = document.querySelector('#itemsTable tbody');
+            const tr = btn.closest('tr');
+            if (!tr) return;
+            tr.remove();
+            if (tbody.querySelectorAll('tr').length === 0) addRow();
+            reindex();
+        }
+
+        function getProductOptionsHtml() {
+            return document.getElementById('productOptionsTemplate').innerHTML;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initSupplierInfo();
+        });
+    </script>
+
+    <script type="text/template" id="productOptionsTemplate">
+        @foreach (var p in products)
+        {
+                <text><option value="@p.Id">@p.Name (@p.SKU)</option></text>
+        }
+    </script>
+    <partial name="_ValidationScriptsPartial" />
+}

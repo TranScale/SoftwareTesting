@@ -1,0 +1,321 @@
+﻿/* File: wwwroot/css/invoices-ui.css */
+
+/* --- 1. Hero Header (Theme Sunset Orange) --- */
+.hero-header {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    border: 1px solid rgba(0,0,0,0.02);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+    .hero-header::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 6px;
+        /* Gradient Cam Vng r?c r? */
+        background: linear-gradient(180deg, #ff9966 0%, #ff5e62 100%);
+    }
+
+.hero-icon-bg {
+    position: absolute;
+    right: -20px;
+    bottom: -20px;
+    font-size: 8rem;
+    color: rgba(0,0,0,0.03);
+    transform: rotate(-15deg);
+    pointer-events: none;
+}
+
+/* Breadcrumb & Stats */
+.breadcrumb-custom {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+    .breadcrumb-custom a {
+        color: #6c757d;
+        text-decoration: none;
+    }
+
+        .breadcrumb-custom a:hover {
+            color: #ff5e62;
+        }
+
+    .breadcrumb-custom .active {
+        color: #a0aec0;
+    }
+
+.stat-badge {
+    background: rgba(255, 94, 98, 0.1);
+    color: #ff5e62;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* --- 2. Card & Table --- */
+.card-modern {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    background: #ffffff;
+    overflow: hidden;
+}
+
+.table-modern thead th {
+    background-color: #fffbf8; /* N?n cam r?t nh?t */
+    color: #5a5c69;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    border-bottom: 2px solid #ffe5d9;
+    padding: 1.2rem 1rem;
+}
+
+.table-modern tbody td {
+    vertical-align: middle;
+    padding: 1rem;
+    color: #343a40;
+    border-bottom: 1px solid #f1f3f5;
+    font-size: 0.95rem;
+}
+
+.table-modern tbody tr:hover {
+    background-color: #fffaf9;
+    transition: all 0.2s ease;
+}
+
+/* --- 3. Status Badges --- */
+.badge-status {
+    padding: 0.5em 1em;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+.status-paid {
+    background: #d1e7dd;
+    color: #0f5132;
+    border: 1px solid #badbcc;
+}
+/* Xanh */
+.status-cancelled {
+    background: #f8d7da;
+    color: #842029;
+    border: 1px solid #f5c2c7;
+}
+/* ? */
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+/* Vng */
+
+/* --- 4. Buttons --- */
+.btn-gradient {
+    background: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%);
+    border: none;
+    color: white;
+    transition: all 0.2s;
+}
+
+    .btn-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 94, 98, 0.4);
+        color: white;
+    }
+
+/* --- 5. Invoice Specific --- */
+.invoice-paper {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.table-input {
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 0.4rem 0.6rem;
+    width: 100%;
+    transition: border-color 0.2s;
+}
+
+    .table-input:focus {
+        border-color: #ff5e62;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(255, 94, 98, 0.1);
+    }
+
+/* Customer mini info popover (Create Invoice) */
+.customer-mini {
+    position: relative;
+}
+
+.customer-info-btn {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.customer-info-popover {
+    position: absolute;
+    top: 110%;
+    right: 0;
+    min-width: 280px;
+    max-width: 340px;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 14px;
+    padding: 12px 14px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    z-index: 999;
+}
+
+    .customer-info-popover::before {
+        content: "";
+        position: absolute;
+        top: -7px;
+        right: 14px;
+        width: 14px;
+        height: 14px;
+        background: #fff;
+        border-left: 1px solid rgba(0,0,0,0.08);
+        border-top: 1px solid rgba(0,0,0,0.08);
+        transform: rotate(45deg);
+    }
+
+    .customer-info-popover .small {
+        line-height: 1.35;
+    }
+
+/* =========================
+   CUSTOMER POPUP OVERLAY
+   - fixed
+   - z-index cao
+   - KHÔNG ảnh hưởng layout
+   ========================= */
+
+.customer-info-btn {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.customer-info-popover,
+.customer-hover-card {
+    position: fixed;
+    display: none;
+    z-index: 9999;
+    width: 320px;
+    max-width: calc(100vw - 24px);
+    background: #fff;
+    border: 1px solid rgba(0,0,0,.08);
+    border-radius: 14px;
+    padding: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.12);
+}
+
+.customer-pop-title {
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #111827;
+}
+
+.customer-pop-row {
+    font-size: 13px;
+    color: #4b5563;
+    line-height: 1.4;
+    margin: 2px 0;
+}
+
+    .customer-pop-row b {
+        color: #111827;
+        font-weight: 600;
+    }
+
+.customer-pop-arrow {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #fff;
+    border-left: 1px solid rgba(0,0,0,.08);
+    border-top: 1px solid rgba(0,0,0,.08);
+    transform: rotate(45deg);
+    top: -6px;
+    left: 18px;
+}
+
+/* Thiết kế Card khách hàng hiện đại */
+.customer-detail-box {
+    background: #ffffff;
+    border: 1px solid #f0f0f0;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    position: relative;
+}
+
+    .customer-detail-box::before {
+        content: "Thông tin khách hàng";
+        position: absolute;
+        top: -12px;
+        left: 20px;
+        background: #fff;
+        padding: 0 10px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #ff5e62;
+        text-transform: uppercase;
+    }
+
+.info-group {
+    display: flex;
+    flex-direction: column;
+}
+
+    .info-group label {
+        font-size: 0.75rem;
+        color: #a0aec0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+        font-weight: 600;
+    }
+
+    .info-group span, .info-group a {
+        font-size: 1rem;
+        color: #2d3748;
+        font-weight: 600;
+    }
+
+    /* Biểu tượng đi kèm */
+    .info-group i {
+        color: #ff9966;
+        width: 20px;
+    }

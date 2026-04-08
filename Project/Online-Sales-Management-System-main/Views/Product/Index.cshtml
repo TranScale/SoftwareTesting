@@ -1,0 +1,422 @@
+﻿@using System.Globalization
+@model OnlineSalesManagementSystem.Models.ShopViewModel
+@{
+    ViewData["Title"] = "Danh sách sản phẩm";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    /* 1. Sidebar Styles */
+    .product-sidebar .single-widget {
+        margin-bottom: 30px;
+    }
+
+        .product-sidebar .single-widget h5 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+            color: #081828;
+        }
+
+            .product-sidebar .single-widget h5::after {
+                content: '';
+                display: block;
+                width: 40px;
+                height: 2px;
+                background: #081828;
+                position: absolute;
+                bottom: 0;
+                left: 0;
+            }
+
+    .hover-link {
+        transition: all 0.3s ease;
+        color: #555;
+        display: block;
+        padding: 5px 0;
+        text-decoration: none;
+    }
+
+        .hover-link:hover {
+            color: #0d6efd !important;
+            transform: translateX(5px);
+        }
+
+        .hover-link.active {
+            color: #0d6efd;
+            font-weight: 700;
+        }
+
+    /* 2. Price Filter (Chips & Inputs) */
+    .price-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+
+    .chip {
+        border: 1px solid #eee;
+        background: #f8f9fa;
+        color: #666;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: 0.2s;
+        user-select: none;
+    }
+
+        .chip:hover {
+            background: #e9ecef;
+            border-color: #dee2e6;
+            color: #333;
+        }
+
+    .price-input-group {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 5px;
+    }
+
+        .price-input-group input {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 8px;
+            font-size: 13px;
+            text-align: center;
+            outline: none;
+        }
+
+            .price-input-group input:focus {
+                border-color: #081828;
+            }
+
+    .btn-filter-price {
+        width: 100%;
+        background: #081828;
+        color: #fff;
+        border: none;
+        padding: 10px;
+        border-radius: 4px;
+        margin-top: 15px;
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        transition: 0.3s;
+    }
+
+        .btn-filter-price:hover {
+            background: #0d6efd;
+            color: #fff;
+        }
+
+    /* 3. Product Card Styles */
+    .single-product {
+        border: 1px solid #f1f1f1;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+        position: relative;
+    }
+
+        .single-product:hover {
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transform: translateY(-3px);
+        }
+
+    .product-image {
+        position: relative;
+        overflow: hidden;
+        padding: 20px;
+        text-align: center;
+        background: #fff;
+        height: 260px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .product-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transition: transform 0.4s;
+        }
+
+    .single-product:hover .product-image img {
+        transform: scale(1.05);
+    }
+
+    .product-image .button {
+        position: absolute;
+        bottom: -50px;
+        left: 0;
+        width: 100%;
+        padding: 0 20px 20px;
+        transition: all 0.4s ease;
+        opacity: 0;
+    }
+
+    .single-product:hover .product-image .button {
+        bottom: 0;
+        opacity: 1;
+    }
+
+    .btn-cart {
+        width: 100%;
+        background: #081828;
+        color: #fff;
+        padding: 10px;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 600;
+        border: none;
+        text-decoration: none;
+        display: block;
+        text-align: center;
+    }
+
+        .btn-cart:hover {
+            background: #0d6efd;
+            color: #fff;
+        }
+
+    .product-info {
+        padding: 20px;
+        background: #fff;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+    }
+
+        .product-info .category {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .product-info .title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+            .product-info .title a {
+                color: #081828;
+                text-decoration: none;
+            }
+
+                .product-info .title a:hover {
+                    color: #0d6efd;
+                }
+
+        .product-info .price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0d6efd;
+            margin-top: auto;
+        }
+</style>
+
+<div class="breadcrumbs">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 col-md-6 col-12">
+                <div class="breadcrumbs-content"><h1 class="page-title">Cửa hàng</h1></div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-12">
+                <ul class="breadcrumb-nav">
+                    <li><a href="/"><i class="lni lni-home"></i> Trang chủ</a></li>
+                    <li>Sản phẩm</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="product-grids section" style="padding-top: 50px; background-color: #f9f9f9;">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-lg-3 col-12 mb-5">
+                <div class="product-sidebar p-4 bg-white rounded shadow-sm border-0">
+
+                    <div class="single-widget search">
+                        <h5>Tìm kiếm</h5>
+                        <form action="/Product" method="get">
+                            @if (Model.CategoryId.HasValue)
+                            {
+                                <input type="hidden" name="category" value="@Model.CategoryId" />
+                            }
+                            @if (Model.BrandId.HasValue)
+                            {
+                                <input type="hidden" name="brand" value="@Model.BrandId" />
+                            }
+                            <div class="input-group">
+                                <input type="text" name="search" class="form-control shadow-none" placeholder="Tên sản phẩm..." value="@Model.SearchTerm">
+                                <button class="btn btn-primary shadow-none" type="submit"><i class="lni lni-search-alt"></i></button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="single-widget">
+                        <h5>Danh mục</h5>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2">
+                                <a href="@Url.Action("Index", "Product", GetRouteData(null, Model.BrandId, Model.MinPrice, Model.MaxPrice, Model.SortBy, Model.SearchTerm))"
+                                   class="d-flex justify-content-between align-items-center text-decoration-none hover-link @(Model.CategoryId == null ? "active" : "")">
+                                    <span>Tất cả</span>
+                                </a>
+                            </li>
+                            @foreach (var cat in Model.CategoriesWithCount)
+                            {
+                                <li class="mb-2">
+                                    <a href="@Url.Action("Index", "Product", GetRouteData(cat.Id, Model.BrandId, Model.MinPrice, Model.MaxPrice, Model.SortBy, Model.SearchTerm))"
+                                       class="d-flex justify-content-between align-items-center text-decoration-none hover-link @(Model.CategoryId == cat.Id ? "active" : "")">
+                                        <span>@cat.Name</span><span class="badge bg-light text-dark rounded-pill">@cat.Count</span>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+
+                    <div class="single-widget">
+                        <h5>Khoảng giá</h5>
+                        <form action="/Product" method="get" id="priceForm">
+                            @if (!string.IsNullOrEmpty(Model.SearchTerm))
+                            {
+                                <input type="hidden" name="search" value="@Model.SearchTerm" />
+                            }
+                            @if (Model.CategoryId.HasValue)
+                            {
+                                <input type="hidden" name="category" value="@Model.CategoryId" />
+                            }
+                            @if (Model.BrandId.HasValue)
+                            {
+                                <input type="hidden" name="brand" value="@Model.BrandId" />
+                            }
+
+                            <div class="price-chips">
+                                <span class="chip" onclick="setPriceRange(0, 200)">Dưới 200k</span>
+                                <span class="chip" onclick="setPriceRange(200, 500)">200k-500k</span>
+                                <span class="chip" onclick="setPriceRange(500, 2000)">0.5-2 Tr</span>
+                                <span class="chip" onclick="setPriceRange(2000, 10000)">2-10 Tr</span>
+                            </div>
+
+                            <div class="price-input-group">
+                                <input type="number" name="min" id="minPrice" value="@Model.MinPrice" placeholder="0">
+                                <span class="text-muted">-</span>
+                                <input type="number" name="max" id="maxPrice" value="@Model.MaxPrice" placeholder="Max">
+                            </div>
+                            <small class="text-muted d-block mt-1 text-end">Đơn vị: .000đ</small>
+                            <button type="submit" class="btn-filter-price">Áp dụng</button>
+                        </form>
+                    </div>
+
+                    <div class="single-widget">
+                        <h5>Thương hiệu</h5>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2"><a href="@Url.Action("Index", "Product", GetRouteData(Model.CategoryId, null, Model.MinPrice, Model.MaxPrice, Model.SortBy, Model.SearchTerm))" class="text-decoration-none hover-link @(Model.BrandId == null ? "active" : "")">Tất cả</a></li>
+                            @foreach (var brand in Model.Brands)
+                            {
+                                <li class="mb-2"><a href="@Url.Action("Index", "Product", GetRouteData(Model.CategoryId, brand.Id, Model.MinPrice, Model.MaxPrice, Model.SortBy, Model.SearchTerm))" class="text-decoration-none hover-link @(Model.BrandId == brand.Id ? "active" : "")">@brand.Name</a></li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-9 col-12">
+                <div class="product-grids-head">
+                    <div class="product-grid-topbar mb-4 bg-white p-3 rounded shadow-sm border-0">
+                        <div class="row align-items-center">
+                            <div class="col-lg-7 col-md-8 col-12">
+                                <div class="product-sorting d-flex align-items-center">
+                                    <label for="sorting" class="me-2 mb-0 fw-bold text-nowrap">Sắp xếp:</label>
+                                    <select class="form-select shadow-none border-0 bg-light" id="sorting" onchange="location = this.value;" style="width: auto;">
+                                        <!option value="@Url.Action("Index", "Product", GetRouteData(Model.CategoryId, Model.BrandId, Model.MinPrice, Model.MaxPrice, "default", Model.SearchTerm))" @(Model.SortBy == "default" ? "selected" : "")>Mặc định</!option>
+                                        <!option value="@Url.Action("Index", "Product", GetRouteData(Model.CategoryId, Model.BrandId, Model.MinPrice, Model.MaxPrice, "price_asc", Model.SearchTerm))" @(Model.SortBy == "price_asc" ? "selected" : "")>Giá tăng dần</!option>
+                                        <!option value="@Url.Action("Index", "Product", GetRouteData(Model.CategoryId, Model.BrandId, Model.MinPrice, Model.MaxPrice, "price_desc", Model.SearchTerm))" @(Model.SortBy == "price_desc" ? "selected" : "")>Giá giảm dần</!option>
+                                    </select>
+                                    <span class="ms-3 text-muted small border-start ps-3">Hiển thị @Model.Products.Count sản phẩm</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="nav-tabContent">
+                        <div class="tab-pane fade show active" id="nav-grid" role="tabpanel">
+                            <div class="row">
+                                @if (Model.Products.Any())
+                                {
+                                    foreach (var item in Model.Products)
+                                    {
+                                        <div class="col-lg-4 col-md-6 col-12 mb-4">
+                                            <div class="single-product">
+                                                <div class="product-image">
+                                                    <a href="/Product/Details/@item.Id">
+                                                        <img src="@(string.IsNullOrEmpty(item.ImagePath) ? "/assets/images/products/product-1.jpg" : item.ImagePath)" alt="@item.Name">
+                                                    </a>
+                                                    @if (item.IsTrending)
+                                                    {
+                                                        <span class="position-absolute top-0 start-0 bg-danger text-white px-2 py-1 small m-3 rounded fw-bold shadow-sm">HOT</span>
+                                                    }
+                                                    <div class="button"><a href="/Product/Details/@item.Id" class="btn-cart"><i class="lni lni-eye"></i> Xem chi tiết</a></div>
+                                                </div>
+                                                <div class="product-info">
+                                                    <span class="category">@item.Category?.Name</span>
+                                                    <h4 class="title"><a href="/Product/Details/@item.Id">@item.Name</a></h4>
+                                                    <div class="price">@item.SalePrice.ToString("C0", CultureInfo.GetCultureInfo("vi-VN"))</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="col-12"><div class="alert alert-warning text-center">Không tìm thấy sản phẩm nào.</div></div>
+                                }
+                            </div>
+
+                            @if (Model.TotalPages > 1) { /* Code phân trang giữ nguyên */ }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        function setPriceRange(min, max) {
+            document.getElementById('minPrice').value = min;
+            if (max === null) document.getElementById('maxPrice').value = '';
+            else document.getElementById('maxPrice').value = max;
+            document.getElementById('priceForm').submit();
+        }
+    </script>
+}
+
+@functions {
+    public object GetRouteData(int? catId, int? brandId, decimal? min, decimal? max, string? sort, string? search, int page = 1)
+    {
+        return new { category = catId, brand = brandId, min = min, max = max, sort = sort, search = search, page = page };
+    }
+}

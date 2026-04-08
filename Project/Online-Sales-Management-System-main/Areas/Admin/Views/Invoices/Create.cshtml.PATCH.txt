@@ -1,0 +1,90 @@
+/*
+APPLY TO: Areas/Admin/Views/Invoices/Create.cshtml
+
+1) Replace the "Khách hàng" UI block with the HTML below.
+2) Add the JS block to @section Scripts (at the bottom of the file).
+*/
+
+<!-- ===== REPLACE your current customer select block with this ===== -->
+<label class="form-label fw-bold text-muted">Khách hàng</label>
+
+<div class="d-flex align-items-center gap-2">
+    <select class="form-select form-select-lg" id="customerSelect" name="CustomerId">
+        <option value="" data-walkin="1">-- Khách lẻ (Walk-in) --</option>
+        @foreach (var c in customers)
+        {
+            <option value="@c.Id"
+                    data-name="@c.Name"
+                    data-phone="@c.Phone"
+                    data-email="@c.Email"
+                    data-address="@c.Address">
+                @c.Name (@c.Phone)
+            </option>
+        }
+    </select>
+
+    <!-- nút info -->
+    <button type="button"
+            id="customerInfoBtn"
+            class="btn btn-outline-secondary btn-sm rounded-circle customer-info-btn"
+            style="display:none;">
+        <i class="fas fa-info"></i>
+    </button>
+</div>
+
+<!-- POPUP OVERLAY -->
+<div id="customerInfoPopover" class="customer-info-popover">
+    <div class="customer-pop-arrow"></div>
+    <div class="customer-pop-title" id="ciName"></div>
+    <div class="customer-pop-row" id="ciPhone"></div>
+    <div class="customer-pop-row" id="ciEmail"></div>
+    <div class="customer-pop-row" id="ciAddress"></div>
+</div>
+
+<!-- ===== ADD/REPLACE the following JS inside @section Scripts ===== -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const select = document.getElementById('customerSelect');
+  const btn = document.getElementById('customerInfoBtn');
+  const pop = document.getElementById('customerInfoPopover');
+
+  const n = document.getElementById('ciName');
+  const p = document.getElementById('ciPhone');
+  const e = document.getElementById('ciEmail');
+  const a = document.getElementById('ciAddress');
+
+  function update() {
+    const opt = select.options[select.selectedIndex];
+    if (!opt || opt.dataset.walkin === "1") {
+      btn.style.display = 'none';
+      pop.style.display = 'none';
+      return;
+    }
+
+    btn.style.display = 'inline-flex';
+    n.textContent = opt.dataset.name || '';
+    p.innerHTML = opt.dataset.phone ? `<b>📞</b> ${opt.dataset.phone}` : '';
+    e.innerHTML = opt.dataset.email ? `<b>✉️</b> ${opt.dataset.email}` : '';
+    a.innerHTML = opt.dataset.address ? `<b>📍</b> ${opt.dataset.address}` : '';
+  }
+
+  function place() {
+    const r = btn.getBoundingClientRect();
+    pop.style.left = Math.min(r.left, window.innerWidth - pop.offsetWidth - 12) + 'px';
+    pop.style.top = (r.bottom + 8) + 'px';
+  }
+
+  let t;
+  btn.addEventListener('mouseenter', () => {
+    clearTimeout(t);
+    pop.style.display = 'block';
+    place();
+  });
+  btn.addEventListener('mouseleave', () => t = setTimeout(() => pop.style.display = 'none', 150));
+  pop.addEventListener('mouseenter', () => clearTimeout(t));
+  pop.addEventListener('mouseleave', () => t = setTimeout(() => pop.style.display = 'none', 150));
+
+  select.addEventListener('change', update);
+  update();
+});
+</script>

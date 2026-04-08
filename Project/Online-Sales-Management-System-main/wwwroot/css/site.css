@@ -1,0 +1,282 @@
+﻿/* =========================================
+   1. SHOP GRIDS & SIDEBAR
+   ========================================= */
+.product-sidebar .single-widget {
+    margin-bottom: 30px;
+}
+
+    .product-sidebar .single-widget h5 {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        position: relative;
+        padding-bottom: 10px;
+        color: #081828;
+    }
+
+        .product-sidebar .single-widget h5::after {
+            content: '';
+            display: block;
+            width: 40px;
+            height: 2px;
+            background: #081828;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+        }
+
+.hover-link {
+    transition: all 0.3s ease;
+    color: #555;
+    display: block;
+    padding: 5px 0;
+    text-decoration: none;
+}
+
+    .hover-link:hover {
+        color: #0d6efd !important;
+        transform: translateX(5px);
+    }
+
+    .hover-link.active {
+        color: #0d6efd;
+        font-weight: 700;
+    }
+
+/* Chips & Filter Price */
+.price-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.chip {
+    border: 1px solid #eee;
+    background: #f8f9fa;
+    color: #666;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: 0.2s;
+    user-select: none;
+}
+
+    .chip:hover {
+        background: #e9ecef;
+        border-color: #dee2e6;
+        color: #333;
+    }
+
+.price-input-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+}
+
+    .price-input-group input {
+        width: 100%;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 8px;
+        font-size: 13px;
+        text-align: center;
+        outline: none;
+    }
+
+        .price-input-group input:focus {
+            border-color: #081828;
+        }
+
+.btn-filter-price {
+    width: 100%;
+    background: #081828;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 15px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    transition: 0.3s;
+}
+
+    .btn-filter-price:hover {
+        background: #0d6efd;
+        color: #fff;
+    }
+
+/* =========================================
+   2. PRODUCT CARD
+   ========================================= */
+.single-product {
+    border: 1px solid #f1f1f1;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    position: relative;
+}
+
+    .single-product:hover {
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        transform: translateY(-3px);
+    }
+
+.product-image {
+    position: relative;
+    overflow: hidden;
+    padding: 20px;
+    text-align: center;
+    background: #fff;
+    height: 260px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .product-image img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        transition: transform 0.4s;
+    }
+
+.single-product:hover .product-image img {
+    transform: scale(1.05);
+}
+
+/* Button overlay */
+.product-image .button {
+    position: absolute;
+    bottom: -50px;
+    left: 0;
+    width: 100%;
+    padding: 0 20px 20px;
+    transition: all 0.4s ease;
+    opacity: 0;
+}
+
+.single-product:hover .product-image .button {
+    bottom: 0;
+    opacity: 1;
+}
+
+.btn-cart {
+    width: 100%;
+    background: #081828;
+    color: #fff;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+}
+
+    .btn-cart:hover {
+        background: #0d6efd;
+        color: #fff;
+    }
+
+.product-info {
+    padding: 20px;
+    background: #fff;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+    .product-info .category {
+        font-size: 12px;
+        color: #888;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .product-info .title {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 10px;
+        line-height: 1.4;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+        .product-info .title a {
+            color: #081828;
+            text-decoration: none;
+        }
+
+            .product-info .title a:hover {
+                color: #0d6efd;
+            }
+
+    .product-info .price {
+        font-size: 18px;
+        font-weight: 700;
+        color: #0d6efd;
+        margin-top: auto;
+    }
+
+/* =========================================
+   3. ADMIN TOGGLE SWITCH (Nút gạt Trending)
+   ========================================= */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #e2e6ea;
+    transition: .3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    border-radius: 34px;
+    border: 1px solid #dcdcdc;
+}
+
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+        transition: .3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        border-radius: 50%;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    }
+
+input:checked + .toggle-slider {
+    background-color: #081828;
+    border-color: #081828;
+}
+
+    input:checked + .toggle-slider:before {
+        transform: translateX(20px);
+    }

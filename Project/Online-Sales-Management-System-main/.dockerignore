@@ -1,0 +1,13 @@
+.git
+.github
+.vs
+.vscode
+bin
+obj
+appsettings.Development.json
+Properties/serviceDependencies.local.json
+Properties/serviceDependencies.local.json.user
+*.user
+*.suo
+*.log
+*.tmp

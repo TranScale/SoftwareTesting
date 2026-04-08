@@ -1,0 +1,59 @@
+/* Product Create page UI */
+
+.hero-header {
+    position: relative;
+    padding: 18px 18px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(78,115,223,0.10), rgba(28,200,138,0.08));
+    border: 1px solid rgba(0,0,0,0.06);
+    overflow: hidden;
+}
+
+.hero-icon-bg {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 84px;
+    color: rgba(0,0,0,0.08);
+    z-index: 0;
+}
+
+.breadcrumb-custom {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+}
+
+.product-form-card {
+    border-radius: 18px;
+}
+
+.image-preview-wrap {
+    border: 1px dashed #d1d3e2;
+    border-radius: 16px;
+    padding: 12px;
+    background: #fff;
+}
+
+.image-preview {
+    width: 100%;
+    aspect-ratio: 1/1;
+    border-radius: 14px;
+    background: #f8f9fc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Make numbers line up a bit nicer */
+input.money {
+    font-variant-numeric: tabular-nums;
+}

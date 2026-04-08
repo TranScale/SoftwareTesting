@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html>
+<html class="no-js" lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <title>@ViewData["Title"] - ShopGrids</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="shortcut icon" type="image/x-icon" href="~/assets/images/favicon.svg" />
+
+    <link rel="stylesheet" href="~/assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/assets/css/LineIcons.3.0.css" />
+    <link rel="stylesheet" href="~/assets/css/tiny-slider.css" />
+    <link rel="stylesheet" href="~/assets/css/glightbox.min.css" />
+    <link rel="stylesheet" href="~/assets/css/main.css" />
+
+    <link rel="stylesheet" href="~/css/chat-widget.css" asp-append-version="true" />
+</head>
+
+<body>
+    <div class="preloader">
+        <div class="preloader-inner">
+            <div class="preloader-icon">
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <partial name="_Header" />
+
+    <div class="container mt-2 d-flex justify-content-end">
+        <partial name="_DatabaseStatusBadge" />
+    </div>
+
+    @RenderBody()
+
+    <partial name="_Footer" />
+
+    <partial name="_ChatWidget" />
+
+    <a href="#" class="scroll-top">
+        <i class="lni lni-chevron-up"></i>
+    </a>
+
+    <script src="~/assets/js/bootstrap.min.js"></script>
+    <script src="~/assets/js/tiny-slider.js"></script>
+    <script src="~/assets/js/glightbox.min.js"></script>
+    <script src="~/assets/js/main.js"></script>
+
+    <script src="~/js/chat-widget.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

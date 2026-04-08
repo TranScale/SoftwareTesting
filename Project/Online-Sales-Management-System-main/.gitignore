@@ -1,0 +1,19 @@
+# Build outputs
+bin/
+obj/
+
+# IDE folders
+.vs/
+
+# User-specific files
+*.user
+*.suo
+
+# Local configuration and secrets
+appsettings.Development.json
+Properties/serviceDependencies.local.json
+Properties/serviceDependencies.local.json.user
+
+# Logs and temp files
+*.log
+*.tmp

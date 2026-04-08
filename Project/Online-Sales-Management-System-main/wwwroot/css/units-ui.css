@@ -1,0 +1,161 @@
+﻿/* File: wwwroot/css/units-ui.css */
+
+/* --- 1. Hero Header --- */
+.hero-header {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    border: 1px solid rgba(0,0,0,0.02);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+    .hero-header::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 6px;
+        background: linear-gradient(180deg, #f093fb 0%, #f5576c 100%); /* Màu hồng cam khác biệt chút để phân biệt */
+    }
+
+.hero-icon-bg {
+    position: absolute;
+    right: -20px;
+    bottom: -20px;
+    font-size: 8rem;
+    color: rgba(0,0,0,0.03);
+    transform: rotate(-15deg);
+    pointer-events: none;
+}
+
+/* Breadcrumb */
+.breadcrumb-custom {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+    .breadcrumb-custom a {
+        color: #6c757d;
+        text-decoration: none;
+    }
+
+        .breadcrumb-custom a:hover {
+            color: #f5576c;
+        }
+
+    .breadcrumb-custom .active {
+        color: #a0aec0;
+    }
+
+/* Badge số lượng */
+.stat-badge {
+    background: rgba(245, 87, 108, 0.1);
+    color: #f5576c;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* --- 2. Card Modern & Table --- */
+.card-modern {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    background: #ffffff;
+    overflow: hidden;
+}
+
+.table-modern thead th {
+    background-color: #fff5f6; /* Nền header bảng hơi hồng nhẹ */
+    color: #5a5c69;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    border-bottom: 2px solid #ffe3e6;
+    padding: 1.2rem 1rem;
+}
+
+.table-modern tbody td {
+    vertical-align: middle;
+    padding: 1.2rem 1rem;
+    color: #343a40;
+    border-bottom: 1px solid #f1f3f5;
+    font-size: 0.95rem;
+}
+
+.table-modern tbody tr {
+    transition: all 0.2s ease;
+}
+
+    .table-modern tbody tr:hover {
+        background-color: #fff9fa;
+        transform: scale(1.002);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+        z-index: 2;
+        position: relative;
+    }
+
+/* --- 3. Buttons & Inputs --- */
+.btn-gradient {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    border: none;
+    color: white;
+    transition: all 0.2s;
+}
+
+    .btn-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+        color: white;
+    }
+
+.btn-icon {
+    width: 35px;
+    height: 35px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s;
+    background: #fff;
+    border: 1px solid #e3e6f0;
+    color: #6e707e;
+}
+
+    .btn-icon:hover {
+        border-color: transparent;
+        color: #fff;
+        transform: rotate(15deg);
+    }
+
+    .btn-icon.edit:hover {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        box-shadow: 0 4px 10px rgba(118, 75, 162, 0.3);
+    }
+
+    .btn-icon.delete:hover {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5253 100%);
+        box-shadow: 0 4px 10px rgba(238, 82, 83, 0.3);
+    }
+
+.id-badge {
+    background: #eef2f7;
+    color: #555;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}

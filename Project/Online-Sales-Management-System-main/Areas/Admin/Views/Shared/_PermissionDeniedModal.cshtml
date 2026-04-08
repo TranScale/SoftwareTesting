@@ -1,0 +1,27 @@
+<div class="modal fade" id="permissionDeniedModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-ban mr-1"></i> Permission denied</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                You don’t have permission to show this page!
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-default" href="/Admin/Dashboard">Go to Dashboard</a>
+                <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.OSMS = window.OSMS || {};
+    window.OSMS.showPermissionDenied = function () {
+        if (!window.jQuery) return;
+        $('#permissionDeniedModal').modal('show');
+    };
+</script>

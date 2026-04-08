@@ -1,0 +1,26 @@
+@{
+    ViewData["Title"] = "Access Denied";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12 col-lg-8 mx-auto">
+        <div class="card card-danger card-outline">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-ban mr-1"></i> Permission denied</h3>
+            </div>
+            <div class="card-body">
+                <p class="mb-3">You don’t have permission to show this page!</p>
+
+                <a class="btn btn-primary" href="/Admin/Dashboard"><i class="fas fa-tachometer-alt mr-1"></i> Go to Dashboard</a>
+                <a class="btn btn-default" href="javascript:history.back()"><i class="fas fa-arrow-left mr-1"></i> Go back</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () { if (window.OSMS && OSMS.showPermissionDenied) OSMS.showPermissionDenied(); });
+    </script>
+}

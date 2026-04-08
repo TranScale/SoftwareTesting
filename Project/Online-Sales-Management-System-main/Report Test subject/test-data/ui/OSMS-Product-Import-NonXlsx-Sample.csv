@@ -1,0 +1,2 @@
+"SKU*","Name*","CategoryId","CategoryName","UnitId","UnitName","BrandId","BrandName","CostPrice","SalePrice","StockOnHand","ReorderLevel","IsActive","IsTrending","ImagePath","Description","Content"
+"QANONXLSX","QA Import CSV Sample","","Laptop","","Cái","","Acer","100000","120000","10","5","true","false","","CSV extension sample","<p>CSV extension sample</p>"

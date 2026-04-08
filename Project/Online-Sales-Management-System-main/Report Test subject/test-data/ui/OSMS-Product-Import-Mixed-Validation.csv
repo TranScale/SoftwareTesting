@@ -1,0 +1,7 @@
+"SKU*","Name*","CategoryId","CategoryName","UnitId","UnitName","BrandId","BrandName","CostPrice","SalePrice","StockOnHand","ReorderLevel","IsActive","IsTrending","ImagePath","Description","Content"
+"QAIMP001","QA Import Product 01","","Laptop","","Cái","","Acer","100000","120000","10","5","true","false","","Valid import row 01","<p>Valid import row 01</p>"
+"QAIMP002","","","Laptop","","Cái","","Acer","100000","120000","10","5","true","false","","Missing name row","<p>Missing name row</p>"
+"QAIMP003","QA Import Product Invalid Category","","UnknownCategory","","Cái","","Acer","100000","120000","10","5","true","false","","Invalid category row","<p>Invalid category row</p>"
+"QAIMP004","QA Import Product Negative Cost","","Laptop","","Cái","","Acer","-1000","120000","10","5","true","false","","Negative cost row","<p>Negative cost row</p>"
+"QAIMPDUP","QA Import Product Duplicate 01","","Laptop","","Cái","","Acer","100000","120000","10","5","true","false","","Duplicate SKU row 01","<p>Duplicate SKU row 01</p>"
+"QAIMPDUP","QA Import Product Duplicate 02","","Laptop","","Cái","","Acer","100000","120000","10","5","true","false","","Duplicate SKU row 02","<p>Duplicate SKU row 02</p>"

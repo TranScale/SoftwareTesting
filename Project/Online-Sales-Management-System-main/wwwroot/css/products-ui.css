@@ -1,0 +1,370 @@
+﻿/* File: wwwroot/css/products-ui.css */
+
+/* --- 1. Hero Header (Theme Blue) --- */
+.hero-header {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    border: 1px solid rgba(0,0,0,0.02);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+    .hero-header::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 6px;
+        /* Gradient Xanh Dương cho Sản phẩm */
+        background: linear-gradient(180deg, #36d1dc 0%, #5b86e5 100%);
+    }
+
+.hero-icon-bg {
+    position: absolute;
+    right: -20px;
+    bottom: -20px;
+    font-size: 8rem;
+    color: rgba(0,0,0,0.03);
+    transform: rotate(-15deg);
+    pointer-events: none;
+}
+
+/* Breadcrumb & Stats */
+.breadcrumb-custom {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+    .breadcrumb-custom a {
+        color: #6c757d;
+        text-decoration: none;
+    }
+
+        .breadcrumb-custom a:hover {
+            color: #5b86e5;
+        }
+
+    .breadcrumb-custom .active {
+        color: #a0aec0;
+    }
+
+.stat-badge {
+    background: rgba(91, 134, 229, 0.1);
+    color: #5b86e5;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* --- 2. Card & Table --- */
+.card-modern {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    background: #ffffff;
+    overflow: hidden;
+}
+
+.table-modern thead th {
+    background-color: #f4f7fe;
+    color: #5a5c69;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    border-bottom: 2px solid #e3e6f0;
+    padding: 1.2rem 1rem;
+}
+
+.table-modern tbody td {
+    vertical-align: middle;
+    padding: 1rem;
+    color: #343a40;
+    border-bottom: 1px solid #f1f3f5;
+    font-size: 0.95rem;
+}
+
+.table-modern tbody tr:hover {
+    background-color: #f8faff;
+    transform: scale(1.002);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+    z-index: 2;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+/* Product Image Thumbnail */
+.product-thumb {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    background-color: #fff;
+    padding: 2px;
+}
+
+.product-thumb-placeholder {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #adb5bd;
+    border: 1px solid #dee2e6;
+}
+
+/* --- 3. Badges & Buttons --- */
+.btn-gradient {
+    background: linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%);
+    border: none;
+    color: white;
+    transition: all 0.2s;
+}
+
+    .btn-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(91, 134, 229, 0.4);
+        color: white;
+    }
+
+.badge-stock-in {
+    background: #e0f2f1;
+    color: #00695c;
+    border: 1px solid #b2dfdb;
+}
+
+.badge-stock-low {
+    background: #fff8e1;
+    color: #ff8f00;
+    border: 1px solid #ffe082;
+}
+
+.badge-stock-out {
+    background: #ffebee;
+    color: #c62828;
+    border: 1px solid #ffcdd2;
+}
+
+/* Action Buttons */
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid #e3e6f0;
+    color: #6e707e;
+    transition: all 0.2s;
+}
+
+    .btn-icon:hover {
+        border-color: transparent;
+        color: #fff;
+    }
+
+    .btn-icon.edit:hover {
+        background: #5b86e5;
+        box-shadow: 0 4px 10px rgba(91, 134, 229, 0.3);
+    }
+
+    .btn-icon.delete:hover {
+        background: #ff6b6b;
+        box-shadow: 0 4px 10px rgba(255, 107, 107, 0.3);
+    }
+
+/* --- 4. Toggle Switch (iOS) --- */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #e9ecef;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+input:checked + .toggle-slider {
+    background-color: #36d1dc;
+}
+
+    input:checked + .toggle-slider:before {
+        transform: translateX(20px);
+    }
+
+/* --- Thêm vào cuối file products-ui.css --- */
+
+/* Product Detail Specifics */
+.product-avatar-container {
+    width: 100px;
+    height: 100px;
+    border-radius: 16px;
+    padding: 4px;
+    background: #fff;
+    border: 1px solid #e3e6f0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.product-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+.product-avatar-placeholder {
+    font-size: 2.5rem;
+    color: #cbd5e0;
+}
+
+/* Stat Box Grid */
+.stat-box {
+    background: #f8f9fc;
+    border-radius: 12px;
+    padding: 1.25rem;
+    height: 100%;
+    border: 1px solid #edf2f7;
+    transition: all 0.2s;
+}
+
+    .stat-box:hover {
+        background: #fff;
+        border-color: #bee3f8;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        transform: translateY(-2px);
+    }
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 0.75rem;
+}
+
+.bg-icon-primary {
+    background: rgba(78, 115, 223, 0.1);
+    color: #4e73df;
+}
+
+.bg-icon-success {
+    background: rgba(28, 200, 138, 0.1);
+    color: #1cc88a;
+}
+
+.bg-icon-warning {
+    background: rgba(246, 194, 62, 0.1);
+    color: #f6c23e;
+}
+
+.bg-icon-danger {
+    background: rgba(231, 74, 59, 0.1);
+    color: #e74a3b;
+}
+
+.bg-icon-info {
+    background: rgba(54, 185, 204, 0.1);
+    color: #36b9cc;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #858796;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+}
+
+.stat-value {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #5a5c69;
+}
+
+/* Price Tag */
+.price-tag {
+    background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+    color: white;
+    padding: 1rem;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(78, 115, 223, 0.3);
+}
+
+/* Search Box Custom */
+.search-box-custom {
+    position: relative;
+    width: 300px;
+}
+
+    .search-box-custom i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #a0aec0;
+    }
+
+    .search-box-custom .form-control {
+        padding-left: 40px;
+        border-radius: 20px;
+        border: 1px solid #e3e6f0;
+        background: #f8f9fc;
+    }
+
+        .search-box-custom .form-control:focus {
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.15);
+        }

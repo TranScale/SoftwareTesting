@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "tidb1": {
+      "type": "mysql",
+      "connectionId": "ConnectionStrings:DefaultConnection"
+    }
+  }
+}

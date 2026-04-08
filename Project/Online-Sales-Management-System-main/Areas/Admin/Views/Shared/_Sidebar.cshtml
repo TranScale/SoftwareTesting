@@ -1,0 +1,352 @@
+@using OnlineSalesManagementSystem.Services.Security
+@inject OnlineSalesManagementSystem.Services.Security.IPermissionService PermissionService
+
+@{
+    var path = (Context.Request.Path.Value ?? "").ToLowerInvariant();
+
+    // Active menu helpers
+    bool IsActive(string startsWith) => path.StartsWith(startsWith.ToLowerInvariant());
+    bool IsAny(params string[] startsWithAny)
+    {
+        foreach (var s in startsWithAny)
+        {
+            if (IsActive(s)) return true;
+        }
+        return false;
+    }
+
+    // Load permissions once (1 DB roundtrip for sidebar)
+    var perms = await PermissionService.GetUserPermissionsAsync(User);
+
+    bool Has(string module, string action)
+    {
+        // Wildcards
+        if (perms.Contains($"{PermissionConstants.Wildcard}.{PermissionConstants.Wildcard}")) return true;
+        if (perms.Contains($"{module}.{PermissionConstants.Wildcard}")) return true;
+        if (perms.Contains($"{PermissionConstants.Wildcard}.{action}")) return true;
+
+        // Exact
+        if (perms.Contains($"{module}.{action}")) return true;
+
+        // Legacy support: "Permissions.Module.Action"
+        if (perms.Contains($"Permissions.{module}.{action}")) return true;
+
+        return false;
+    }
+
+    bool HasAny(string module)
+    {
+        foreach (var a in PermissionConstants.Actions.All)
+        {
+            if (Has(module, a)) return true;
+        }
+        return false;
+    }
+
+    // ====== POS (Sales) ======
+    var canInvoiceCreate = Has(PermissionConstants.Modules.Invoices, PermissionConstants.Actions.Create);var canInvoiceShow = Has(PermissionConstants.Modules.Invoices, PermissionConstants.Actions.Show);var canCustomers = HasAny(PermissionConstants.Modules.Customers);
+
+    var showPosSection = canInvoiceCreate || canInvoiceShow || canCustomers;
+
+    // ====== Warehouse & Products ======
+    var canProducts = HasAny(PermissionConstants.Modules.Products);
+    var canCategories = HasAny(PermissionConstants.Modules.Categories);
+    var canUnits = HasAny(PermissionConstants.Modules.Units);
+    var canBrands = HasAny(PermissionConstants.Modules.Brands);
+
+    var canStock = HasAny(PermissionConstants.Modules.Stock);
+    var canPurchases = HasAny(PermissionConstants.Modules.Purchases);
+    var canSuppliers = HasAny(PermissionConstants.Modules.Suppliers);
+
+    var showCatalogGroup = canCategories || canUnits || canBrands;
+    var showWarehouseGroup = canStock || canPurchases || canSuppliers;
+
+    var showWarehouseSection = canProducts || showCatalogGroup || showWarehouseGroup;
+
+    // ====== System ======
+    var canEmployees = HasAny(PermissionConstants.Modules.Employees);
+    var canAttendance = HasAny(PermissionConstants.Modules.Attendance);
+    var canExpenses = HasAny(PermissionConstants.Modules.Expenses);
+    var canReports = HasAny(PermissionConstants.Modules.Reports);
+    var canSettings = HasAny(PermissionConstants.Modules.Settings);
+
+    // Admin & permissions
+    var canAdminsList = Has(PermissionConstants.Modules.Admin, PermissionConstants.Actions.Show);var canAdminsCreate = Has(PermissionConstants.Modules.Admin, PermissionConstants.Actions.Create);var canGroupsList = Has(PermissionConstants.Modules.AdminGroups, PermissionConstants.Actions.Show);var showAdminPermissionGroup = canAdminsList || canAdminsCreate || canGroupsList;
+
+    var showSystemSection =
+        canEmployees || canAttendance || canExpenses || canReports || canSettings || showAdminPermissionGroup;
+
+    // Open groups only if the group exists
+    var adminOpen = showAdminPermissionGroup && IsAny("/admin/admins", "/admin/admingroups");
+    var stockOpen = showWarehouseGroup && IsAny("/admin/stock", "/admin/purchases", "/admin/suppliers");
+    var catalogOpen = showCatalogGroup && IsAny("/admin/categories", "/admin/units", "/admin/brands");
+}
+
+<nav class="mt-2">
+    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+
+        @* Dashboard *@
+        @if (HasAny(PermissionConstants.Modules.Dashboard))
+        {
+            <li class="nav-item">
+                <a href="/Admin/Dashboard" class="nav-link @(IsActive("/admin/dashboard") ? "active" : "")">
+                    <i class="nav-icon fas fa-tachometer-alt"></i>
+                    <p>Dashboard</p>
+                </a>
+            </li>
+        }
+
+        @* POS *@
+        @if (showPosSection)
+        {
+            <li class="nav-header">BÁN HÀNG (POS)</li>
+
+            @if (canInvoiceCreate)
+            {
+                <li class="nav-item">
+                    <a href="/Admin/Invoices/Create" class="nav-link @(IsActive("/admin/invoices/create") ? "active" : "")">
+                        <i class="nav-icon fas fa-cash-register text-warning"></i>
+                        <p>Bán hàng ngay</p>
+                    </a>
+                </li>
+            }
+
+            @if (canInvoiceShow)
+            {
+                <li class="nav-item">
+                    <a href="/Admin/Invoices" class="nav-link @(IsActive("/admin/invoices") && !IsActive("/admin/invoices/create") ? "active" : "")">
+                        <i class="nav-icon fas fa-file-invoice-dollar"></i>
+                        <p>Hóa đơn</p>
+                    </a>
+                </li>
+            }
+
+            @if (canCustomers)
+            {
+                <li class="nav-item">
+                    <a href="/Admin/Customers" class="nav-link @(IsActive("/admin/customers") ? "active" : "")">
+                        <i class="nav-icon fas fa-users"></i>
+                        <p>Khách hàng</p>
+                    </a>
+                </li>
+            }
+        }
+
+        @* Warehouse & Products *@
+        @if (showWarehouseSection)
+        {
+            <li class="nav-header">KHO &amp; SẢN PHẨM</li>
+
+            @if (canProducts)
+            {
+                <li class="nav-item">
+                    <a href="/Admin/Products" class="nav-link @(IsActive("/admin/products") ? "active" : "")">
+                        <i class="nav-icon fas fa-box"></i>
+                        <p>Sản phẩm</p>
+                    </a>
+                </li>
+            }
+
+            @if (showCatalogGroup)
+            {
+                <li class="nav-item @(catalogOpen ? "menu-open" : "")">
+                    <a href="#" class="nav-link @(catalogOpen ? "active" : "")">
+                        <i class="nav-icon fas fa-layer-group"></i>
+                        <p>
+                            Danh mục &amp; Đơn vị
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        @if (canCategories)
+                        {
+                            <li class="nav-item">
+                                <a href="/Admin/Categories" class="nav-link @(IsActive("/admin/categories") ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Danh mục</p>
+                                </a>
+                            </li>
+                        }
+                        @if (canUnits)
+                        {
+                            <li class="nav-item">
+                                <a href="/Admin/Units" class="nav-link @(IsActive("/admin/units") ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Đơn vị tính</p>
+                                </a>
+                            </li>
+                        }
+                        @if (canBrands)
+                        {
+                            <li class="nav-item">
+                                <a href="/Admin/Brands" class="nav-link @(IsActive("/admin/brands") ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Thương hiệu</p>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </li>
+            }
+
+            @if (showWarehouseGroup)
+            {
+                <li class="nav-item @(stockOpen ? "menu-open" : "")">
+                    <a href="#" class="nav-link @(stockOpen ? "active" : "")">
+                        <i class="nav-icon fas fa-warehouse"></i>
+                        <p>
+                            Quản lý Kho
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        @if (canStock)
+                        {
+                            <li class="nav-item">
+                                <a href="/Admin/Stock" class="nav-link @(IsActive("/admin/stock") && !IsActive("/admin/stock/low") && !IsActive("/admin/stock/movements") ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Tồn kho hiện tại</p>
+                                </a>
+                            </li>
+                        }
+
+                        @if (canPurchases)
+                        {
+                            <li class="nav-item">
+                                <a href="/Admin/Purchases" class="nav-link @(IsActive("/admin/purchases") ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Nhập hàng (Purchases)</p>
+                                </a>
+                            </li>
+                        }
+
+                        @if (canSuppliers)
+                        {
+                            <li class="nav-item">
+                                <a href="/Admin/Suppliers" class="nav-link @(IsActive("/admin/suppliers") ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Nhà cung cấp</p>
+                                </a>
+                            </li>
+                        }
+
+                        @if (canStock)
+                        {
+                            <li class="nav-item">
+                                <a href="/Admin/Stock/Low" class="nav-link @(IsActive("/admin/stock/low") ? "active" : "")">
+                                    <i class="far fa-circle nav-icon text-warning"></i>
+                                    <p>Cảnh báo tồn thấp</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/Admin/Stock/Movements" class="nav-link @(IsActive("/admin/stock/movements") ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Lịch sử kho</p>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </li>
+            }
+        }
+
+        @* System *@
+        @if (showSystemSection)
+        {
+            <li class="nav-header">QUẢN TRỊ HỆ THỐNG</li>
+
+            @if (canEmployees)
+            {
+                <li class="nav-item">
+                    <a href="/Admin/Employees" class="nav-link @(IsActive("/admin/employees") ? "active" : "")">
+                        <i class="nav-icon fas fa-id-card-alt"></i>
+                        <p>Nhân viên</p>
+                    </a>
+                </li>
+            }
+
+            @if (canAttendance)
+            {
+                <li class="nav-item">
+                    <a href="/Admin/Attendance" class="nav-link @(IsActive("/admin/attendance") ? "active" : "")">
+                        <i class="nav-icon fas fa-calendar-check"></i>
+                        <p>Chấm công</p>
+                    </a>
+                </li>
+            }
+
+            @if (canExpenses)
+            {
+                <li class="nav-item">
+                    <a href="/Admin/Expenses" class="nav-link @(IsActive("/admin/expenses") ? "active" : "")">
+                        <i class="nav-icon fas fa-coins text-danger"></i>
+                        <p>Chi phí</p>
+                    </a>
+                </li>
+            }
+
+            @if (canReports)
+            {
+                <li class="nav-item">
+                    <a href="/Admin/Reports" class="nav-link @(IsActive("/admin/reports") ? "active" : "")">
+                        <i class="nav-icon fas fa-chart-bar"></i>
+                        <p>Báo cáo</p>
+                    </a>
+                </li>
+            }
+
+            @if (showAdminPermissionGroup)
+            {
+                <li class="nav-item @(adminOpen ? "menu-open" : "")">
+                    <a href="#" class="nav-link @(adminOpen ? "active" : "")">
+                        <i class="nav-icon fas fa-users-cog"></i>
+                        <p>
+                            Admin &amp; Phân quyền
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        @if (canAdminsList)
+                        {
+                            <li class="nav-item">
+                                <a href="/Admin/Admins" class="nav-link @(IsActive("/admin/admins") && !IsActive("/admin/admins/create") ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Danh sách Admin</p>
+                                </a>
+                            </li>
+                        }
+                        @if (canAdminsCreate)
+                        {
+                            <li class="nav-item">
+                                <a href="/Admin/Admins/Create" class="nav-link @(IsActive("/admin/admins/create") ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Tạo Admin mới</p>
+                                </a>
+                            </li>
+                        }
+                        @if (canGroupsList)
+                        {
+                            <li class="nav-item">
+                                <a href="/Admin/AdminGroups" class="nav-link @(IsActive("/admin/admingroups") ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Nhóm quyền (Groups)</p>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </li>
+            }
+
+            @if (canSettings)
+            {
+                <li class="nav-item">
+                    <a href="/Admin/Settings" class="nav-link @(IsActive("/admin/settings") ? "active" : "")">
+                        <i class="nav-icon fas fa-cogs"></i>
+                        <p>Cài đặt chung</p>
+                    </a>
+                </li>
+            }
+        }
+
+    </ul>
+</nav>

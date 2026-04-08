@@ -1,0 +1,152 @@
+@using OnlineSalesManagementSystem.Services.Common
+@model List<OnlineSalesManagementSystem.Domain.Entities.StockMovement>
+@using OnlineSalesManagementSystem.Domain.Entities
+@{
+    ViewData["Title"] = "Lịch sử Kho";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    var products = ViewBag.Products as List<Product> ?? new();
+    int? productId = ViewBag.ProductId as int?;
+    string from = ViewBag.From as string ?? "";
+    string to = ViewBag.To as string ?? "";
+
+    // Tính tổng để hiển thị thống kê
+    int inTotal = Model.Where(m => m.Type == StockMovementType.In).Sum(m => m.Qty);
+    int outTotal = Model.Where(m => m.Type == StockMovementType.Out).Sum(m => m.Qty);
+    int adjTotal = Model.Where(m => m.Type == StockMovementType.Adjust).Sum(m => m.Qty);
+}
+
+<link rel="stylesheet" href="~/css/stock-ui.css" />
+
+<div class="container-fluid py-4" style="background-color: #f8f9fc;">
+
+    <div class="hero-header">
+        <i class="fas fa-dolly-flatbed hero-icon-bg"></i>
+        <div class="d-flex justify-content-between align-items-center position-relative" style="z-index: 1;">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-custom mb-2">
+                        <li class="breadcrumb-item"><a href="/Admin/Stock">Kho hàng</a></li>
+                        <li class="breadcrumb-item active">Lịch sử</li>
+                    </ol>
+                </nav>
+                <div class="d-flex align-items-center gap-3">
+                    <h2 class="fw-bold text-dark mb-0">Lịch sử Nhập xuất</h2>
+                </div>
+                <p class="text-muted mt-2 mb-0">Nhật ký chi tiết các giao dịch làm thay đổi số lượng tồn kho (1000 dòng gần nhất).</p>
+            </div>
+
+            <a href="/Admin/Stock" class="btn btn-outline-secondary rounded-pill px-4">
+                <i class="fas fa-arrow-left me-2"></i>Quay lại
+            </a>
+        </div>
+    </div>
+
+    <div class="card card-modern mb-4">
+        <div class="card-body p-4">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-12 col-md-4 col-xl-3">
+                    <label class="form-label small fw-bold text-muted">Sản phẩm</label>
+                    <select class="form-select shadow-sm" name="productId">
+                        <option value="">-- Tất cả sản phẩm --</option>
+                        @foreach (var p in products)
+                        {
+                            var selected = (productId.HasValue && productId.Value == p.Id) ? "selected" : null;
+                            <option value="@p.Id" selected="@selected">@p.Name (@p.SKU)</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-6 col-md-3 col-xl-2">
+                    <label class="form-label small fw-bold text-muted">Từ ngày</label>
+                    <input class="form-control shadow-sm" type="date" name="from" value="@from" />
+                </div>
+
+                <div class="col-6 col-md-3 col-xl-2">
+                    <label class="form-label small fw-bold text-muted">Đến ngày</label>
+                    <input class="form-control shadow-sm" type="date" name="to" value="@to" />
+                </div>
+
+                <div class="col-12 col-md-2 d-flex gap-2">
+                    <button class="btn btn-gradient w-100 fw-bold shadow-sm" type="submit">Lọc</button>
+                    <a class="btn btn-light w-100 shadow-sm" href="/Admin/Stock/Movements"><i class="fas fa-sync-alt"></i></a>
+                    <a class="btn btn-success w-100 fw-bold shadow-sm"
+                       href="/Admin/Stock/ExportMovementsExcel?productId=@(productId?.ToString() ?? "")&from=@from&to=@to"
+                       title="Xuất Excel">
+                        <i class="fas fa-file-excel me-1"></i>Excel
+                    </a>
+                </div>
+
+                <div class="col-12 col-xl-3">
+                    <div class="d-flex justify-content-around bg-light rounded-3 p-2 border">
+                        <div class="text-center">
+                            <div class="small text-muted fw-bold">Nhập (In)</div>
+                            <div class="text-success fw-bold">@inTotal</div>
+                        </div>
+                        <div class="vr"></div>
+                        <div class="text-center">
+                            <div class="small text-muted fw-bold">Xuất (Out)</div>
+                            <div class="text-danger fw-bold">@outTotal</div>
+                        </div>
+                        <div class="vr"></div>
+                        <div class="text-center">
+                            <div class="small text-muted fw-bold">Đ.Chỉnh</div>
+                            <div class="text-dark fw-bold">@adjTotal</div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card card-modern">
+        <div class="card-body px-0 pt-0">
+            <div class="table-responsive">
+                <table class="table table-modern mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">#ID</th>
+                            <th>Ngày giờ</th>
+                            <th>Sản phẩm</th>
+                            <th class="text-center">Loại</th>
+                            <th class="text-center">Số lượng</th>
+                            <th>Chứng từ (Ref)</th>
+                            <th>Ghi chú</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Count == 0)
+                        {
+                            <tr><td colspan="7" class="text-center py-5 text-muted">Không tìm thấy giao dịch nào.</td></tr>
+                        }
+                        else
+                        {
+                            foreach (var m in Model)
+                            {
+                                string badgeClass = m.Type switch
+                                {
+                                    StockMovementType.In => "move-in",
+                                    StockMovementType.Out => "move-out",
+                                    _ => "move-adj"
+                                };
+                                string typeLabel = m.Type.ToString();
+
+                                <tr>
+                                    <td class="ps-4 text-muted">@m.Id</td>
+                                    <td>@AppTime.ToVietnamTime(m.MovementDate).ToString("HH:mm dd/MM/yyyy")</td>
+                                    <td><span class="fw-bold text-dark">@m.Product?.Name</span></td>
+                                    <td class="text-center"><span class="badge-move @badgeClass">@typeLabel</span></td>
+                                    <td class="text-center fw-bold">@m.Qty</td>
+                                    <td class="text-muted small">
+                                        <i class="fas fa-file-alt me-1"></i>@m.RefType #@m.RefId
+                                    </td>
+                                    <td class="text-muted small">@m.Note</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

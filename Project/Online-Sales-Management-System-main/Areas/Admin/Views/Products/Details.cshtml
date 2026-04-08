@@ -1,0 +1,234 @@
+@model OnlineSalesManagementSystem.Areas.Admin.Controllers.ProductsController.ProductDetailsVm
+@using OnlineSalesManagementSystem.Domain.Entities
+@{
+    ViewData["Title"] = "Chi tiết sản phẩm";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    var p = Model.Product;
+}
+
+<link rel="stylesheet" href="~/css/products-ui.css" asp-append-version="true" />
+
+<div class="container-fluid py-4" style="background-color:#f8f9fc;">
+    <div class="hero-header d-flex justify-content-between align-items-center mb-4">
+        <i class="fas fa-box-open hero-icon-bg"></i>
+        <div style="z-index:1;">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-custom mb-2">
+                    <li class="breadcrumb-item"><a href="/Admin/Products">Sản phẩm</a></li>
+                    <li class="breadcrumb-item active">Chi tiết</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold text-dark mb-0">@p.Name</h2>
+            <div class="text-muted small mt-1">SKU: <span class="fw-bold text-primary">@p.SKU</span></div>
+        </div>
+        <div style="z-index:1;">
+            <a href="/Admin/Products" class="btn btn-light border rounded-pill px-4 fw-bold text-secondary shadow-sm hover-scale">
+                <i class="fas fa-arrow-left me-2"></i>Quay lại
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-12 col-xl-4">
+            <div class="card card-modern h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex flex-column align-items-center text-center mb-4">
+                        <div class="product-avatar-container">
+                            @if (!string.IsNullOrWhiteSpace(p.ImagePath))
+                            {
+                                <img src="@p.ImagePath" alt="@p.Name" class="product-avatar" />
+                            }
+                            else
+                            {
+                                <div class="product-avatar-placeholder"><i class="fas fa-image"></i></div>
+                            }
+                        </div>
+
+                        <div class="d-flex gap-2 justify-content-center flex-wrap mb-3">
+                            <span class="badge @(p.IsActive ? "bg-success-subtle text-success border border-success-subtle" : "bg-secondary-subtle text-secondary") rounded-pill px-3">
+                                @(p.IsActive ? "Đang kinh doanh" : "Ngừng kinh doanh")
+                            </span>
+                            @if (p.IsTrending)
+                            {
+                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3">
+                                    <i class="fas fa-bolt me-1"></i>Trending
+                                </span>
+                            }
+                        </div>
+
+                        <div class="price-tag w-100 mb-3">
+                            <div class="small opacity-75 text-uppercase fw-bold">Giá bán hiện tại</div>
+                            <div class="h3 fw-bold mb-0">@p.SalePrice.ToString("N0") <small>VNĐ</small></div>
+                        </div>
+
+                        <div class="text-muted small fst-italic">
+                            @(string.IsNullOrWhiteSpace(p.Description) ? "Chưa có mô tả cho sản phẩm này." : p.Description)
+                        </div>
+                    </div>
+
+                    <hr class="border-light my-4" />
+
+                    <h6 class="fw-bold text-dark mb-3"><i class="fas fa-info-circle me-2 text-primary"></i>Thông tin chi tiết</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded-3 border">
+                                <div class="small text-muted fw-bold">Danh mục</div>
+                                <div class="fw-bold text-dark">@(p.Category?.Name ?? "—")</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded-3 border">
+                                <div class="small text-muted fw-bold">Đơn vị tính</div>
+                                <div class="fw-bold text-dark">@(p.Unit?.Name ?? "—")</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold text-dark mb-3"><i class="fas fa-chart-pie me-2 text-primary"></i>Hiệu suất kho hàng</h6>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="stat-box">
+                                <div class="stat-icon bg-icon-info"><i class="fas fa-boxes"></i></div>
+                                <div class="stat-label">Tồn kho</div>
+                                <div class="stat-value">@p.StockOnHand</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-box">
+                                <div class="stat-icon bg-icon-warning"><i class="fas fa-bell"></i></div>
+                                <div class="stat-label">Báo động</div>
+                                <div class="stat-value">@p.ReorderLevel</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-box">
+                                <div class="stat-icon bg-icon-success"><i class="fas fa-shopping-cart"></i></div>
+                                <div class="stat-label">Đã bán</div>
+                                <div class="stat-value text-success">@Model.TotalSoldQty</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-box">
+                                <div class="stat-icon bg-icon-danger"><i class="fas fa-sack-dollar"></i></div>
+                                <div class="stat-label">Doanh thu</div>
+                                <div class="stat-value text-danger">@Model.TotalRevenue.ToString("#,##0")</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-8">
+            <div class="card card-modern h-100">
+                <div class="card-header bg-white border-bottom-0 pt-4 px-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                    <div>
+                        <h5 class="fw-bold mb-1 text-dark"><i class="fas fa-history me-2 text-primary"></i>Lịch sử giao dịch</h5>
+                        <div class="text-muted small">Danh sách các hóa đơn có chứa sản phẩm <strong>@p.Name</strong></div>
+                    </div>
+
+                    <div class="search-box-custom">
+                        <i class="fas fa-search"></i>
+                        <input id="orderSearch" class="form-control" placeholder="Tìm mã hóa đơn, khách hàng..." />
+                    </div>
+                </div>
+
+                <div class="card-body p-0 mt-2">
+                    <div class="table-responsive">
+                        <table class="table table-modern mb-0" id="ordersTable">
+                            <thead>
+                                <tr>
+                                    <th class="ps-4">Mã hóa đơn</th>
+                                    <th>Khách hàng</th>
+                                    <th>Ngày tạo</th>
+                                    <th class="text-center">SL</th>
+                                    <th class="text-end">Đơn giá</th>
+                                    <th class="text-end pe-4">Thành tiền</th>
+                                    <th class="text-center">Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Orders.Count == 0)
+                                {
+                                    <tr>
+                                        <td colspan="7" class="text-center py-5">
+                                            <div class="text-muted mb-2"><i class="fas fa-clipboard-list fa-3x opacity-25"></i></div>
+                                            <div class="text-muted">Chưa có hóa đơn nào chứa sản phẩm này.</div>
+                                        </td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    foreach (var o in Model.Orders)
+                                    {
+                                        string badgeClass = o.Status switch
+                                        {
+                                            InvoiceStatus.Paid => "badge-status status-paid",
+                                            InvoiceStatus.Cancelled => "badge-status status-cancelled",
+                                            _ => "badge-status status-pending"
+                                        };
+                                        string statusText = o.Status switch
+                                        {
+                                            InvoiceStatus.Paid => "Đã TT",
+                                            InvoiceStatus.Cancelled => "Đã hủy",
+                                            _ => "Chờ TT"
+                                        };
+
+                                        <tr class="order-row">
+                                            <td class="ps-4">
+                                                <a class="fw-bold text-primary text-decoration-none" href="/Admin/Invoices/Details/@o.InvoiceId">
+                                                    <i class="fas fa-file-invoice me-1"></i>@o.InvoiceNo
+                                                </a>
+                                            </td>
+                                            <td>
+                                                @if (o.CustomerId.HasValue)
+                                                {
+                                                    <a href="/Admin/Customers/Details/@o.CustomerId.Value" class="fw-semibold text-dark text-decoration-none hover-underline">
+                                                        @o.CustomerName
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted fst-italic"><i class="fas fa-user-secret me-1"></i>@o.CustomerName</span>
+                                                }
+                                            </td>
+                                            <td class="text-muted small">@AppTime.ToVietnamTime(o.InvoiceDate).ToString("HH:mm dd/MM/yyyy")</td>
+                                            <td class="text-center fw-bold text-dark">@o.Qty</td>
+                                            <td class="text-end text-secondary">@o.UnitPrice.ToString("N0")</td>
+                                            <td class="text-end pe-4 fw-bold text-dark">@o.LineTotal.ToString("N0")</td>
+                                            <td class="text-center"><span class="@badgeClass">@statusText</span></td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                @if (Model.Orders.Count > 0)
+                {
+                    <div class="card-footer bg-white border-top border-dashed px-4 py-3 text-muted small d-flex justify-content-between">
+                        <span>Hiển thị <strong>@Model.Orders.Count</strong> hóa đơn gần nhất.</span>
+                        <span><i class="fas fa-database me-1"></i>Dữ liệu hệ thống</span>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const input = document.getElementById('orderSearch');
+        const rows = Array.from(document.querySelectorAll('#ordersTable tbody .order-row'));
+
+        input?.addEventListener('input', function(){
+            const q = (this.value || '').toLowerCase().trim();
+            rows.forEach(r => {
+                const text = r.innerText.toLowerCase();
+                r.style.display = text.includes(q) ? '' : 'none';
+            });
+        });
+    </script>
+}

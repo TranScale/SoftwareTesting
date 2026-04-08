@@ -1,0 +1,101 @@
+﻿/* File: wwwroot/css/settings-ui.css */
+
+/* --- 1. Hero Header (Theme Midnight Slate) --- */
+.hero-header {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    border: 1px solid rgba(0,0,0,0.02);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+    .hero-header::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 6px;
+        /* Gradient Xám Đen sang trọng */
+        background: linear-gradient(180deg, #232526 0%, #414345 100%);
+    }
+
+.hero-icon-bg {
+    position: absolute;
+    right: -20px;
+    bottom: -20px;
+    font-size: 8rem;
+    color: rgba(0,0,0,0.05);
+    transform: rotate(-15deg);
+    pointer-events: none;
+}
+
+/* Breadcrumb */
+.breadcrumb-custom {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+    .breadcrumb-custom a {
+        color: #6c757d;
+        text-decoration: none;
+    }
+
+        .breadcrumb-custom a:hover {
+            color: #232526;
+        }
+
+    .breadcrumb-custom .active {
+        color: #a0aec0;
+    }
+
+/* --- 2. Card Modern --- */
+.card-modern {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    background: #ffffff;
+    overflow: hidden;
+}
+
+/* --- 3. Buttons --- */
+.btn-gradient {
+    background: linear-gradient(135deg, #232526 0%, #414345 100%);
+    border: none;
+    color: white;
+    transition: all 0.2s;
+}
+
+    .btn-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(35, 37, 38, 0.4);
+        color: white;
+    }
+
+/* --- 4. Preview Box --- */
+.preview-box {
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+    .preview-box:hover {
+        border-color: #adb5bd;
+        background: #f1f3f5;
+    }
+
+.preview-logo {
+    max-width: 100%;
+    max-height: 120px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+}

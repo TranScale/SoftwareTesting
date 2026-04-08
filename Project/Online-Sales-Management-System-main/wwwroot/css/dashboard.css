@@ -1,0 +1,183 @@
+﻿/* File: wwwroot/css/dashboard.css */
+
+/* --- 1. Hero Header (Dashboard Style) --- */
+.dashboard-header {
+    background: #fff;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    border: 1px solid rgba(0,0,0,0.02);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+    /* Gradient viền trái */
+    .dashboard-header::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 6px;
+        background: linear-gradient(180deg, #11998e 0%, #38ef7d 100%); /* Xanh lá đầy năng lượng */
+    }
+
+/* Icon nền chìm */
+.dashboard-icon-bg {
+    position: absolute;
+    right: -20px;
+    bottom: -30px;
+    font-size: 10rem;
+    color: rgba(0,0,0,0.03);
+    transform: rotate(-15deg);
+    pointer-events: none;
+}
+
+/* --- 2. Clean Card Styles --- */
+.dash-card {
+    border: none;
+    border-radius: 16px; /* Bo tròn hơn */
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    transition: all 0.3s ease;
+    background: #fff;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+    .dash-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+    }
+
+    .dash-card .card-body {
+        padding: 1.5rem;
+        flex: 1;
+    }
+
+/* Footer của Card */
+.card-footer-custom {
+    background-color: #fff;
+    border-top: 1px solid #f0f0f0;
+    padding: 1rem 1.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+    .card-footer-custom a {
+        text-decoration: none;
+        transition: color 0.2s;
+        display: flex;
+        align-items: center;
+    }
+
+        .card-footer-custom a:hover {
+            text-decoration: none;
+        }
+
+/* --- 3. Icon Circles & Typography --- */
+.icon-circle {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    margin-bottom: 0.5rem;
+    transition: transform 0.3s;
+}
+
+.dash-card:hover .icon-circle {
+    transform: scale(1.1) rotate(10deg);
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #2c3e50;
+    margin-bottom: 0;
+    line-height: 1.2;
+}
+
+.stat-label {
+    color: #95a5a6;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+}
+
+/* --- 4. Theme Colors (Đồng bộ với các Module) --- */
+/* Products: Blue */
+.theme-blue {
+    background-color: #e3f2fd;
+    color: #1565c0;
+}
+
+.text-blue {
+    color: #1565c0 !important;
+}
+
+/* Customers: Cyan */
+.theme-cyan {
+    background-color: #e0f7fa;
+    color: #00acc1;
+}
+
+.text-cyan {
+    color: #00acc1 !important;
+}
+
+/* Purchases: Emerald */
+.theme-emerald {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.text-emerald {
+    color: #2e7d32 !important;
+}
+
+/* Invoices: Orange */
+.theme-orange {
+    background-color: #fff3e0;
+    color: #ef6c00;
+}
+
+.text-orange {
+    color: #ef6c00 !important;
+}
+
+/* Expenses: Red */
+.theme-red {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.text-red {
+    color: #c62828 !important;
+}
+
+/* Suppliers/Stock: Indigo */
+.theme-indigo {
+    background-color: #e8eaf6;
+    color: #3949ab;
+}
+
+.text-indigo {
+    color: #3949ab !important;
+}
+
+/* Employees: Royal Blue/Purple */
+.theme-purple {
+    background-color: #f3e5f5;
+    color: #7b1fa2;
+}

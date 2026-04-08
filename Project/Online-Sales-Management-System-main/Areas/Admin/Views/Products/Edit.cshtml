@@ -1,0 +1,207 @@
+﻿@model OnlineSalesManagementSystem.Domain.Entities.Product
+@using OnlineSalesManagementSystem.Domain.Entities
+@{
+    ViewData["Title"] = "Cập nhật Sản phẩm";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    var categories = ViewBag.Categories as List<Category> ?? new();
+    var units = ViewBag.Units as List<Unit> ?? new();
+    var brands = ViewBag.Brands as List<Brand> ?? new();
+}
+
+<link rel="stylesheet" href="~/css/products-ui.css" asp-append-version="true" />
+
+<div class="container-fluid py-4" style="background-color: #f8f9fc;">
+    <div class="hero-header d-flex justify-content-between align-items-center mb-4">
+        <div style="z-index: 1;">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-custom mb-2">
+                    <li class="breadcrumb-item"><a href="/Admin/Products">Sản phẩm</a></li>
+                    <li class="breadcrumb-item active">Chỉnh sửa</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold text-dark mb-0">Cập nhật sản phẩm</h2>
+            <div class="text-muted small mt-1">Đang chỉnh sửa: <span class="fw-bold text-primary">@Model.Name</span></div>
+        </div>
+        <div style="z-index: 1;">
+            <a href="/Admin/Products" class="btn btn-light border rounded-pill px-4 fw-bold text-secondary shadow-sm hover-scale">
+                <i class="fas fa-arrow-left me-2"></i>Quay lại
+            </a>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-10">
+            <form action="/Admin/Products/Edit" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" name="Id" value="@Model.Id" />
+
+                <div class="row g-4">
+                    <div class="col-12 col-lg-8">
+                        <div class="card card-modern h-100">
+                            <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+                                <h6 class="fw-bold text-dark"><i class="fas fa-info-circle me-2 text-primary"></i>Thông tin chung</h6>
+                            </div>
+                            <div class="card-body p-4">
+                                @if (!ViewData.ModelState.IsValid)
+                                {
+                                    <div class="alert alert-danger border-0 shadow-sm rounded-3 mb-4">
+                                        @Html.ValidationSummary(false)
+                                    </div>
+                                }
+
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold text-secondary small text-uppercase">Mã SKU <span class="text-danger">*</span></label>
+                                        <input type="text" name="SKU" value="@Model.SKU" class="form-control fw-bold text-dark" required />
+                                    </div>
+                                    <div class="col-md-8">
+                                        <label class="form-label fw-bold text-secondary small text-uppercase">Tên sản phẩm <span class="text-danger">*</span></label>
+                                        <input type="text" name="Name" value="@Model.Name" class="form-control fw-bold" required />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-secondary small text-uppercase">Danh mục</label>
+                                        <select name="CategoryId" class="form-select">
+                                            <option value="">-- Chọn danh mục --</option>
+                                            @foreach (var c in categories)
+                                            {
+                                                <!option value="@c.Id" @(Model.CategoryId == c.Id ? "selected" : "")>@c.Name</!option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-secondary small text-uppercase">Đơn vị tính</label>
+                                        <select name="UnitId" class="form-select">
+                                            <option value="">-- Chọn đơn vị --</option>
+                                            @foreach (var u in units)
+                                            {
+                                                <!option value="@u.Id" @(Model.UnitId == u.Id ? "selected" : "")>@u.Name</!option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-secondary small text-uppercase">Thương hiệu</label>
+                                        <select name="BrandId" class="form-select">
+                                            <option value="">-- Chọn thương hiệu --</option>
+                                            @foreach (var b in brands)
+                                            {
+                                                <!option value="@b.Id" @(Model.BrandId == b.Id ? "selected" : "")>@b.Name</!option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold text-secondary small text-uppercase">Mô tả sản phẩm</label>
+                                        <textarea name="Description" class="form-control" rows="3">@Model.Description</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-lg-4">
+                        <div class="card card-modern mb-4">
+                            <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+                                <h6 class="fw-bold text-dark"><i class="fas fa-tags me-2 text-success"></i>Giá & Kho hàng</h6>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-secondary small text-uppercase">Giá bán</label>
+                                    <div class="input-group">
+                                        <input type="number" name="SalePrice" value="@Model.SalePrice" class="form-control fw-bold text-primary" placeholder="0" />
+                                        <span class="input-group-text bg-light fw-bold">VNĐ</span>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-secondary small text-uppercase">Giá vốn</label>
+                                    <div class="input-group">
+                                        <input type="number" name="CostPrice" value="@Model.CostPrice" class="form-control text-muted" placeholder="0" />
+                                        <span class="input-group-text bg-light text-muted">VNĐ</span>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-secondary small text-uppercase">Cảnh báo tồn kho</label>
+                                    <input type="number" name="ReorderLevel" value="@Model.ReorderLevel" class="form-control" />
+                                    <div class="form-text small">Báo động khi tồn dưới mức này.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card card-modern">
+                            <div class="card-body p-4">
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold text-secondary small text-uppercase">Link Ảnh (URL)</label>
+                                    <div class="d-flex gap-2 align-items-start">
+                                        <div class="border rounded p-1 bg-light" style="width: 60px; height: 60px; flex-shrink:0;">
+                                            @if (!string.IsNullOrEmpty(Model.ImagePath))
+                                            {
+                                                <img src="@Model.ImagePath" class="w-100 h-100 object-fit-cover rounded" id="imgPreview" />
+                                            }
+                                            else
+                                            {
+                                                <div class="w-100 h-100 d-flex align-items-center justify-content-center text-muted">
+                                                    <i class="fas fa-image"></i>
+                                                </div>
+                                            }
+                                        </div>
+                                        <input type="text" name="ImagePath" value="@Model.ImagePath" class="form-control" placeholder="https://..." oninput="updatePreview(this)" />
+                                    </div>
+                                </div>
+
+                                <div class="p-3 bg-light rounded-3 d-flex align-items-center border mb-3">
+                                    <label class="toggle-switch me-3">
+                                        <input type="checkbox" name="IsTrending" value="true" @(Model.IsTrending ? "checked" : "")>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <input type="hidden" name="IsTrending" value="false" />
+                                    <div>
+                                        <label class="fw-bold mb-0 text-dark" style="cursor:pointer;">Sản phẩm nổi bật</label>
+                                        <div class="text-muted small">Hiển thị nhãn "Trending"</div>
+                                    </div>
+                                </div>
+
+                                <div class="p-3 bg-light rounded-3 d-flex align-items-center border">
+                                    <label class="toggle-switch me-3">
+                                        <input type="checkbox" name="IsActive" value="true" @(Model.IsActive ? "checked" : "")>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <input type="hidden" name="IsActive" value="false" />
+                                    <div>
+                                        <label class="fw-bold mb-0 text-dark" style="cursor:pointer;">Đang kinh doanh</label>
+                                        <div class="text-muted small">Cho phép bán sản phẩm này</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 d-flex justify-content-end gap-3 mt-2 pb-5">
+                        <a href="/Admin/Products" class="btn btn-light rounded-pill px-4 fw-bold border hover-scale">Hủy bỏ</a>
+                        <button type="submit" class="btn btn-gradient rounded-pill px-5 shadow fw-bold hover-scale">
+                            <i class="fas fa-save me-2"></i>Lưu thay đổi
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function updatePreview(input) {
+            // Tìm container chứa ảnh (div cha của cha)
+            const container = input.previousElementSibling;
+            if (!container) return;
+
+            const url = input.value;
+            if (url && url.length > 5) {
+                container.innerHTML = `<img src="${url}" class="w-100 h-100 object-fit-cover rounded" onerror="this.src=''; this.parentElement.innerHTML='<div class=\'w-100 h-100 d-flex align-items-center justify-content-center text-muted\'><i class=\'fas fa-image\'></i></div>'"/>`;
+            } else {
+                container.innerHTML = `<div class="w-100 h-100 d-flex align-items-center justify-content-center text-muted"><i class="fas fa-image"></i></div>`;
+            }
+        }
+    </script>
+}

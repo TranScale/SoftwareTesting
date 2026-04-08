@@ -1,0 +1,125 @@
+/* File: wwwroot/css/customer-details.css */
+
+.customer-details-page {
+    font-family: "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif;
+}
+
+/* Modern card look (compatible with AdminLTE) */
+.card-modern {
+    border: 1px solid rgba(0,0,0,0.04);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+}
+
+.customer-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 20px;
+    color: #fff;
+    background: linear-gradient(135deg, #00c9ff 0%, #92fe9d 100%);
+}
+
+.customer-info-list .info-row {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    border-top: 1px dashed rgba(0,0,0,0.06);
+}
+
+.customer-info-list .info-row:first-child {
+    border-top: 0;
+}
+
+.customer-info-list .label {
+    width: 140px;
+    color: #6c757d;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+}
+
+.customer-info-list .value {
+    flex: 1;
+    color: #111827;
+    font-weight: 600;
+    word-break: break-word;
+}
+
+.stat-card {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.04);
+    border-radius: 16px;
+    padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    height: 100%;
+}
+
+.stat-title {
+    color: #6c757d;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.stat-value {
+    margin-top: 6px;
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #111827;
+    letter-spacing: -0.3px;
+}
+
+.stat-sub {
+    margin-top: 2px;
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+.search-pill .input-group-text,
+.search-pill .form-control {
+    border-radius: 999px;
+}
+
+.filter-pill {
+    border-radius: 999px;
+}
+
+/* Badges */
+.badge-status {
+    padding: 0.35rem 0.55rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.badge-paid { background: rgba(25, 135, 84, 0.12); color: #198754; }
+.badge-unpaid { background: rgba(220, 53, 69, 0.12); color: #dc3545; }
+.badge-partial { background: rgba(255, 193, 7, 0.16); color: #b58100; }
+.badge-cancel { background: rgba(108, 117, 125, 0.14); color: #6c757d; }
+.badge-draft { background: rgba(13, 110, 253, 0.12); color: #0d6efd; }
+
+/* Table tweaks */
+.table thead th {
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.table tbody td {
+    vertical-align: middle;
+}
+
+.empty-state {
+    border: 1px dashed rgba(0,0,0,0.12);
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    color: #6c757d;
+}

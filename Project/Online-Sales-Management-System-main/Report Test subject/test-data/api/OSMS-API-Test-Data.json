@@ -1,0 +1,226 @@
+{
+  "baseUrl": "http://localhost:5068",
+  "auth": {
+    "required": false,
+    "type": "none",
+    "notes": "Current public API surface does not require bearer token or session cookie."
+  },
+  "sampleIds": {
+    "productId": 30073,
+    "productSku": "SP001",
+    "categoryId": 30012,
+    "categoryName": "Laptop",
+    "brandId": 30039,
+    "brandName": "Acer"
+  },
+  "runtimeObservations": {
+    "totalActiveProducts": 34,
+    "trendingCategoryCount": 3,
+    "trendingProductCount": 8
+  },
+  "positiveQueries": [
+    {
+      "id": "API-DATA-POS-001",
+      "endpoint": "/api/v1/health",
+      "method": "GET",
+      "description": "Health smoke request",
+      "query": {}
+    },
+    {
+      "id": "API-DATA-POS-002",
+      "endpoint": "/api/v1/catalog/products",
+      "method": "GET",
+      "description": "Default paginated catalog request",
+      "query": {
+        "page": 1,
+        "pageSize": 2
+      }
+    },
+    {
+      "id": "API-DATA-POS-003",
+      "endpoint": "/api/v1/catalog/products",
+      "method": "GET",
+      "description": "Search by SKU",
+      "query": {
+        "search": "SP001",
+        "page": 1,
+        "pageSize": 5
+      }
+    },
+    {
+      "id": "API-DATA-POS-004",
+      "endpoint": "/api/v1/catalog/products",
+      "method": "GET",
+      "description": "Filter by category",
+      "query": {
+        "categoryId": 30012,
+        "page": 1,
+        "pageSize": 5
+      }
+    },
+    {
+      "id": "API-DATA-POS-005",
+      "endpoint": "/api/v1/catalog/products",
+      "method": "GET",
+      "description": "Filter by brand",
+      "query": {
+        "brandId": 30039,
+        "page": 1,
+        "pageSize": 5
+      }
+    },
+    {
+      "id": "API-DATA-POS-006",
+      "endpoint": "/api/v1/catalog/products",
+      "method": "GET",
+      "description": "Price range with valid sort",
+      "query": {
+        "minPrice": 0,
+        "maxPrice": 5000000,
+        "sort": "price_asc",
+        "page": 1,
+        "pageSize": 5
+      }
+    },
+    {
+      "id": "API-DATA-POS-007",
+      "endpoint": "/api/v1/catalog/products/30073",
+      "method": "GET",
+      "description": "Valid product detail request",
+      "query": {}
+    },
+    {
+      "id": "API-DATA-POS-008",
+      "endpoint": "/api/v1/catalog/trending",
+      "method": "GET",
+      "description": "Trending data request",
+      "query": {}
+    },
+    {
+      "id": "API-DATA-POS-009",
+      "endpoint": "/api/v1/catalog/filters",
+      "method": "GET",
+      "description": "Filters lookup request",
+      "query": {}
+    }
+  ],
+  "negativeQueries": [
+    {
+      "id": "API-DATA-NEG-001",
+      "endpoint": "/api/v1/catalog/products",
+      "method": "GET",
+      "description": "Page below boundary",
+      "query": {
+        "page": 0,
+        "pageSize": 5
+      },
+      "expectedStatusCode": 400
+    },
+    {
+      "id": "API-DATA-NEG-002",
+      "endpoint": "/api/v1/catalog/products",
+      "method": "GET",
+      "description": "Page size below boundary",
+      "query": {
+        "page": 1,
+        "pageSize": 0
+      },
+      "expectedStatusCode": 400
+    },
+    {
+      "id": "API-DATA-NEG-003",
+      "endpoint": "/api/v1/catalog/products",
+      "method": "GET",
+      "description": "Page size above boundary",
+      "query": {
+        "page": 1,
+        "pageSize": 101
+      },
+      "expectedStatusCode": 400
+    },
+    {
+      "id": "API-DATA-NEG-004",
+      "endpoint": "/api/v1/catalog/products",
+      "method": "GET",
+      "description": "Negative minPrice",
+      "query": {
+        "minPrice": -1,
+        "page": 1,
+        "pageSize": 5
+      },
+      "expectedStatusCode": 400
+    },
+    {
+      "id": "API-DATA-NEG-005",
+      "endpoint": "/api/v1/catalog/products",
+      "method": "GET",
+      "description": "Negative maxPrice",
+      "query": {
+        "maxPrice": -1,
+        "page": 1,
+        "pageSize": 5
+      },
+      "expectedStatusCode": 400
+    },
+    {
+      "id": "API-DATA-NEG-006",
+      "endpoint": "/api/v1/catalog/products",
+      "method": "GET",
+      "description": "minPrice greater than maxPrice",
+      "query": {
+        "minPrice": 5000000,
+        "maxPrice": 100000,
+        "page": 1,
+        "pageSize": 5
+      },
+      "expectedStatusCode": 400
+    },
+    {
+      "id": "API-DATA-NEG-007",
+      "endpoint": "/api/v1/catalog/products",
+      "method": "GET",
+      "description": "Unsupported sort option",
+      "query": {
+        "sort": "popularity",
+        "page": 1,
+        "pageSize": 5
+      },
+      "expectedStatusCode": 400
+    },
+    {
+      "id": "API-DATA-NEG-008",
+      "endpoint": "/api/v1/catalog/products",
+      "method": "GET",
+      "description": "Page exceeds total pages",
+      "query": {
+        "page": 999,
+        "pageSize": 2
+      },
+      "expectedStatusCode": 400
+    },
+    {
+      "id": "API-DATA-NEG-009",
+      "endpoint": "/api/v1/catalog/products/0",
+      "method": "GET",
+      "description": "Invalid product detail id boundary",
+      "query": {},
+      "expectedStatusCode": 400
+    },
+    {
+      "id": "API-DATA-NEG-010",
+      "endpoint": "/api/v1/catalog/products/999999999",
+      "method": "GET",
+      "description": "Unknown product id",
+      "query": {},
+      "expectedStatusCode": 404
+    }
+  ],
+  "notes": {
+    "reusable": true,
+    "commitAllowed": true,
+    "sensitiveDataExcluded": [
+      "TiDB password in User Secrets",
+      "Any future external bearer token"
+    ]
+  }
+}

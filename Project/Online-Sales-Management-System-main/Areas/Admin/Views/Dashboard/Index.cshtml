@@ -1,0 +1,240 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+
+    // Số liệu thống kê
+    int admins = (int)(ViewBag.AdminsCount ?? 0);
+    int products = (int)(ViewBag.ProductsCount ?? 0);
+    int customers = (int)(ViewBag.CustomersCount ?? 0);
+    int suppliers = (int)(ViewBag.SuppliersCount ?? 0);
+    int purchases = (int)(ViewBag.PurchasesCount ?? 0);
+    int invoices = (int)(ViewBag.InvoicesCount ?? 0);
+    int expenses = (int)(ViewBag.ExpensesCount ?? 0);
+    int lowStock = (int)(ViewBag.LowStockCount ?? 0);
+
+    decimal todaySales = (decimal)(ViewBag.TodaySales ?? 0m);
+    decimal monthSales = (decimal)(ViewBag.MonthSales ?? 0m);
+}
+
+<link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+
+<div class="container-fluid py-4" style="background-color: #f8f9fc;">
+
+    <div class="dashboard-header">
+        <i class="fas fa-chart-line dashboard-icon-bg"></i>
+        <div style="z-index: 1;">
+            <h2 class="fw-bold text-dark mb-1">Xin chào, Admin! 👋</h2>
+            <p class="text-muted mb-0">
+                Hôm nay là <strong>@DateTime.Now.ToString("dd/MM/yyyy")</strong>. Chúc bạn một ngày làm việc hiệu quả.
+            </p>
+        </div>
+        <div style="z-index: 1;" class="text-end d-none d-md-block">
+            <a href="/Admin/Invoices/Create" class="btn btn-primary shadow-lg rounded-pill px-4 py-2 fw-bold">
+                <i class="fas fa-plus me-2"></i>Tạo đơn mới
+            </a>
+        </div>
+    </div>
+
+    <h6 class="text-muted fw-bold text-uppercase mb-3 px-1"><i class="fas fa-chart-pie me-2"></i>Tổng quan tài chính</h6>
+    <div class="row g-4 mb-5">
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="dash-card">
+                <div class="card-body d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="stat-label">Doanh thu hôm nay</p>
+                        <h3 class="stat-value text-orange">@todaySales.ToString("N0")</h3>
+                        <small class="text-muted">VNĐ</small>
+                    </div>
+                    <div class="icon-circle theme-orange">
+                        <i class="fas fa-cash-register"></i>
+                    </div>
+                </div>
+                <div class="card-footer-custom">
+                    <a href="/Admin/Invoices" class="text-orange">Xem hóa đơn <i class="fas fa-arrow-right ms-auto"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="dash-card">
+                <div class="card-body d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="stat-label">Doanh thu tháng</p>
+                        <h3 class="stat-value text-blue">@monthSales.ToString("N0")</h3>
+                        <small class="text-muted">VNĐ</small>
+                    </div>
+                    <div class="icon-circle theme-blue">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                </div>
+                <div class="card-footer-custom">
+                    <a href="/Admin/Reports" class="text-blue">Xem báo cáo <i class="fas fa-arrow-right ms-auto"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="dash-card">
+                <div class="card-body d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="stat-label">Tổng phiếu chi</p>
+                        <h3 class="stat-value text-red">@expenses</h3>
+                        <small class="text-muted">Phiếu</small>
+                    </div>
+                    <div class="icon-circle theme-red">
+                        <i class="fas fa-file-invoice"></i>
+                    </div>
+                </div>
+                <div class="card-footer-custom">
+                    <a href="/Admin/Expenses" class="text-red">Quản lý chi phí <i class="fas fa-arrow-right ms-auto"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="dash-card">
+                <div class="card-body d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="stat-label">Tổng hóa đơn</p>
+                        <h3 class="stat-value text-dark">@invoices</h3>
+                        <small class="text-muted">Đơn hàng</small>
+                    </div>
+                    <div class="icon-circle theme-indigo">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                </div>
+                <div class="card-footer-custom">
+                    <a href="/Admin/Invoices" class="text-indigo">Lịch sử đơn hàng <i class="fas fa-arrow-right ms-auto"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h6 class="text-muted fw-bold text-uppercase mb-3 px-1"><i class="fas fa-boxes me-2"></i>Vận hành kho & Nhân sự</h6>
+    <div class="row g-4 mb-4">
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="dash-card">
+                <div class="card-body d-flex align-items-center">
+                    <div class="icon-circle theme-blue me-3 mb-0">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div>
+                        <h4 class="stat-value mb-0">@products</h4>
+                        <span class="text-muted small fw-bold text-uppercase">Sản phẩm</span>
+                    </div>
+                    <a href="/Admin/Products" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="dash-card">
+                <div class="card-body d-flex align-items-center">
+                    <div class="icon-circle theme-cyan me-3 mb-0">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div>
+                        <h4 class="stat-value mb-0">@customers</h4>
+                        <span class="text-muted small fw-bold text-uppercase">Khách hàng</span>
+                    </div>
+                    <a href="/Admin/Customers" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="dash-card">
+                <div class="card-body d-flex align-items-center">
+                    <div class="icon-circle theme-indigo me-3 mb-0">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <div>
+                        <h4 class="stat-value mb-0">@suppliers</h4>
+                        <span class="text-muted small fw-bold text-uppercase">Nhà cung cấp</span>
+                    </div>
+                    <a href="/Admin/Suppliers" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="dash-card">
+                <div class="card-body d-flex align-items-center">
+                    <div class="icon-circle theme-emerald me-3 mb-0">
+                        <i class="fas fa-dolly"></i>
+                    </div>
+                    <div>
+                        <h4 class="stat-value mb-0">@purchases</h4>
+                        <span class="text-muted small fw-bold text-uppercase">Phiếu nhập</span>
+                    </div>
+                    <a href="/Admin/Purchases" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-12 col-lg-8">
+            <div class="dash-card h-100">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-4 text-dark"><i class="fas fa-bolt text-warning me-2"></i>Truy cập nhanh</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <a class="btn btn-light border p-3 w-100 text-start shadow-sm d-flex align-items-center" href="/Admin/Invoices/Create">
+                                <div class="icon-circle theme-orange mb-0 me-3" style="width: 40px; height: 40px; font-size: 1.2rem;">
+                                    <i class="fas fa-file-invoice-dollar"></i>
+                                </div>
+                                <span class="fw-bold text-dark">Tạo Hóa Đơn Mới</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a class="btn btn-light border p-3 w-100 text-start shadow-sm d-flex align-items-center" href="/Admin/Purchases/Create">
+                                <div class="icon-circle theme-emerald mb-0 me-3" style="width: 40px; height: 40px; font-size: 1.2rem;">
+                                    <i class="fas fa-cart-plus"></i>
+                                </div>
+                                <span class="fw-bold text-dark">Nhập Hàng Mới</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a class="btn btn-light border p-3 w-100 text-start shadow-sm d-flex align-items-center" href="/Admin/Admins">
+                                <div class="icon-circle theme-indigo mb-0 me-3" style="width: 40px; height: 40px; font-size: 1.2rem;">
+                                    <i class="fas fa-user-shield"></i>
+                                </div>
+                                <span class="fw-bold text-dark">Quản lý Admin</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a class="btn btn-light border p-3 w-100 text-start shadow-sm d-flex align-items-center" href="/Admin/Settings">
+                                <div class="icon-circle theme-purple mb-0 me-3" style="width: 40px; height: 40px; font-size: 1.2rem;">
+                                    <i class="fas fa-cogs"></i>
+                                </div>
+                                <span class="fw-bold text-dark">Cài đặt Hệ thống</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-4">
+            <div class="dash-card h-100" style="border-left: 5px solid #ffca28; background: #fffbf0;">
+                <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                    <div class="icon-circle bg-warning text-dark mx-auto mt-2 shadow-sm">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h5 class="fw-bold mt-3 text-dark">Cảnh báo tồn kho</h5>
+                    <p class="text-muted small">Sản phẩm dưới định mức cần nhập thêm</p>
+
+                    <h1 class="display-3 fw-bold text-warning mb-3">@lowStock</h1>
+
+                    <a href="/Admin/Stock/Low" class="btn btn-warning rounded-pill px-4 shadow-sm fw-bold w-100">
+                        <i class="fas fa-warehouse me-2"></i> Xem chi tiết
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/dashboard.js" asp-append-version="true"></script>
+}

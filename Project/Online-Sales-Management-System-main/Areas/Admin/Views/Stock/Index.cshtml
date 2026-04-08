@@ -1,0 +1,167 @@
+﻿@model List<OnlineSalesManagementSystem.Domain.Entities.Product>
+@{
+    ViewData["Title"] = "Quản lý Tồn kho";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    string q = ViewBag.Query as string ?? "";
+    int page = (int)(ViewBag.Page ?? 1);
+    int pageSize = (int)(ViewBag.PageSize ?? 10);
+    int total = (int)(ViewBag.Total ?? 0);
+
+    int totalPages = pageSize <= 0 ? 0 : (int)Math.Ceiling(total / (double)pageSize);
+    bool hasPrev = page > 1;
+    bool hasNext = page < totalPages;
+    int start = (page - 1) * pageSize + (total == 0 ? 0 : 1);
+    int end = Math.Min(page * pageSize, total);
+}
+
+<link rel="stylesheet" href="~/css/stock-ui.css" />
+
+<div class="container-fluid py-4" style="background-color: #f8f9fc;">
+
+    <div class="hero-header">
+        <i class="fas fa-warehouse hero-icon-bg"></i>
+        <div class="d-flex justify-content-between align-items-center position-relative" style="z-index: 1;">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-custom mb-2">
+                        <li class="breadcrumb-item"><a href="/Admin/Dashboard">Dashboard</a></li>
+                        <li class="breadcrumb-item active">Kho hàng</li>
+                    </ol>
+                </nav>
+                <div class="d-flex align-items-center gap-3">
+                    <h2 class="fw-bold text-dark mb-0">Tồn kho hiện tại</h2>
+                    <span class="stat-badge"><i class="fas fa-boxes"></i> @total sản phẩm</span>
+                </div>
+                <p class="text-muted mt-2 mb-0">Theo dõi số lượng tồn kho thực tế của tất cả sản phẩm.</p>
+            </div>
+
+            <div class="d-flex gap-2">
+                <a href="/Admin/Stock/Low" class="btn btn-warning shadow-sm px-3 py-2 rounded-pill fw-bold text-dark">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Cảnh báo tồn thấp
+                </a>
+                <a href="/Admin/Stock/Movements" class="btn btn-gradient shadow-lg px-4 py-2 rounded-pill fw-bold">
+                    <i class="fas fa-history me-2"></i>Lịch sử nhập xuất
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card card-modern">
+        <div class="card-header bg-white border-bottom-0 pt-4 px-4 pb-0">
+            <form method="get" class="row g-3 align-items-center">
+                <input type="hidden" name="page" value="1" />
+
+                <div class="col-12 col-md-5">
+                    <div class="input-group shadow-sm" style="border-radius: 50px; overflow: hidden;">
+                        <span class="input-group-text bg-white border-end-0 ps-3"><i class="fas fa-search text-muted"></i></span>
+                        <input class="form-control border-start-0" name="q" value="@q" placeholder="Tìm SKU, tên sản phẩm..." style="border-left: none;">
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-2">
+                    <select class="form-select shadow-sm" name="pageSize" onchange="this.form.submit()" style="border-radius: 20px;">
+                        @{
+                            var sizes = new[] { 10, 25, 50, 100 };
+                        }
+                        @foreach (var s in sizes)
+                        {
+                            <option value="@s" selected="@(s == pageSize ? "selected" : null)">@s dòng</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-auto ms-auto">
+                    <a href="/Admin/Stock" class="btn btn-light rounded-pill px-3 shadow-sm"><i class="fas fa-sync-alt me-1"></i> Reset</a>
+                    <button type="submit" class="btn btn-outline-primary rounded-pill px-3 shadow-sm">Tìm kiếm</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card-body px-0 pt-3">
+            <div class="table-responsive">
+                <table class="table table-modern mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">#ID</th>
+                            <th>Mã SKU</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Danh mục</th>
+                            <th>Đơn vị</th>
+                            <th class="text-center">Tồn kho</th>
+                            <th class="text-center">Định mức đặt lại</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (total == 0)
+                        {
+                            <tr><td colspan="7" class="text-center py-5 text-muted">Không tìm thấy sản phẩm nào.</td></tr>
+                        }
+                        else
+                        {
+                            foreach (var p in Model)
+                            {
+                                bool isLow = p.StockOnHand <= p.ReorderLevel;
+                                <tr class="@(isLow ? "row-low-stock" : "")">
+                                    <td class="ps-4 text-muted">@p.Id</td>
+                                    <td><span class="fw-bold text-dark">@p.SKU</span></td>
+                                    <td>@p.Name</td>
+                                    <td class="text-muted">@p.Category?.Name</td>
+                                    <td class="text-muted">@p.Unit?.Name</td>
+                                    <td class="text-center">
+                                        @if (isLow)
+                                        {
+                                            <span class="badge bg-warning text-dark border border-warning">@p.StockOnHand</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success bg-opacity-10 text-success border border-success">@p.StockOnHand</span>
+                                        }
+                                    </td>
+                                    <td class="text-center text-muted">@p.ReorderLevel</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (total > 0)
+            {
+                <div class="px-4 py-2 mt-2 small text-muted">
+                    <i class="fas fa-info-circle text-warning me-1"></i> Các dòng màu vàng thể hiện sản phẩm sắp hết hàng (Tồn kho ≤ Định mức).
+                </div>
+            }
+        </div>
+
+        @if (total > 0)
+        {
+            <div class="card-footer bg-white border-top-0 d-flex align-items-center justify-content-between py-3 px-4">
+                <div class="text-muted small">Hiển thị @start - @end trong @total dòng</div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0 shadow-sm">
+                        <li class="page-item @(hasPrev ? "" : "disabled")"><a class="page-link rounded-start" href="@BuildUrl(page - 1)">Trước</a></li>
+                        @{
+                            int s = Math.Max(1, page - 2); int endP = Math.Min(totalPages, page + 2);
+                            for (int i = s; i <= endP; i++)
+                            {
+                                <li class="page-item @(i == page ? "active" : "")"><a class="page-link" href="@BuildUrl(i)">@i</a></li>
+                            }
+                        }
+                        <li class="page-item @(hasNext ? "" : "disabled")"><a class="page-link rounded-end" href="@BuildUrl(page + 1)">Sau</a></li>
+                    </ul>
+                </nav>
+            </div>
+        }
+    </div>
+</div>
+
+@functions {
+    private string BuildUrl(int page)
+    {
+        if (page < 1) page = 1;
+        string q = ViewBag.Query as string ?? "";
+        int pageSize = (int)(ViewBag.PageSize ?? 10);
+        return $"/Admin/Stock?q={Uri.EscapeDataString(q)}&page={page}&pageSize={pageSize}";
+    }
+}

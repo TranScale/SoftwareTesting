@@ -1,0 +1,15 @@
+/* Thêm vào cuối wwwroot/css/invoices-ui.css */
+.row-stock-warn td { background: #fff4e5 !important; }   /* cam nhạt */
+.row-stock-danger td { background: #ffe8e8 !important; } /* đỏ nhạt */
+
+.customer-hover-card{
+  position: fixed;
+  display:none;
+  z-index: 2000;
+  width: 280px;
+  background:#fff;
+  border:1px solid rgba(0,0,0,.08);
+  border-radius: 12px;
+  padding: 12px 12px;
+}
+.customer-link{ position:relative; }

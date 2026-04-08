@@ -1,0 +1,299 @@
+@model OnlineSalesManagementSystem.Domain.Entities.Invoice
+@using OnlineSalesManagementSystem.Domain.Entities
+@{
+    ViewData["Title"] = "Chi tiết Hóa đơn";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    // Thiết lập lớp CSS cho trạng thái hóa đơn
+    string badgeClass = Model.Status switch
+    {
+        InvoiceStatus.Paid => "status-paid",
+        InvoiceStatus.Cancelled => "status-cancelled",
+        _ => "status-pending"
+    };
+
+    // Thiết lập nhãn hiển thị cho trạng thái
+    string statusLabel = Model.Status switch
+    {
+        InvoiceStatus.Paid => "Đã thanh toán",
+        InvoiceStatus.Cancelled => "Đã hủy",
+        _ => "Chờ thanh toán"
+    };
+
+    // Tính toán dư nợ
+    var due = Math.Max(0m, Model.GrandTotal - Model.PaidAmount);
+}
+
+<link rel="stylesheet" href="~/css/invoices-ui.css" />
+
+<div class="container-fluid py-4" style="background-color: #f8f9fc;">
+
+    <div class="hero-header mb-4">
+        <div class="d-flex justify-content-between align-items-start position-relative" style="z-index: 1;">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-custom mb-2">
+                        <li class="breadcrumb-item"><a href="/Admin/Invoices">Hóa đơn</a></li>
+                        <li class="breadcrumb-item active">Chi tiết</li>
+                    </ol>
+                </nav>
+                <h2 class="fw-bold text-dark mb-1">Hóa đơn #@Model.InvoiceNo</h2>
+                <div class="d-flex align-items-center gap-3 mt-2">
+                    <span class="badge-status @badgeClass">@statusLabel</span>
+                    <span class="text-muted small"><i class="far fa-calendar-alt me-1"></i> @AppTime.ToVietnamTime(Model.InvoiceDate).ToString("HH:mm dd/MM/yyyy")</span>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <a class="btn btn-outline-secondary rounded-pill px-4" href="/Admin/Invoices">Quay lại</a>
+                <a class="btn btn-outline-primary rounded-pill px-4" href="/Admin/Invoices/Print/@Model.Id" target="_blank"><i class="fas fa-print me-2"></i>In phiếu</a>
+
+                @if (Model.Status != InvoiceStatus.Cancelled)
+                {
+                    <form method="post" action="/Admin/Invoices/Cancel/@Model.Id" class="m-0">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-outline-danger rounded-pill px-4" onclick="return confirm('Bạn có chắc chắn muốn hủy hóa đơn và hoàn trả tồn kho?');">
+                            <i class="fas fa-ban me-2"></i>Hủy đơn
+                        </button>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-12 col-xl-8">
+            <div class="card card-modern">
+                <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+                    <h5 class="fw-bold text-dark mb-4">Thông tin khách hàng & Sản phẩm</h5>
+
+                    <div class="customer-detail-box">
+                        <div class="info-group">
+                            <label style="font-size: 0.75rem; color: #a0aec0; text-transform: uppercase; font-weight: 600; margin-bottom: 4px; display: block;">Khách hàng</label>
+                            @if (Model.CustomerId.HasValue)
+                            {
+                                <a id="invoiceCustomerLink" class="customer-link-highlight" href="/Admin/Customers/Details/@Model.CustomerId" data-customer-id="@Model.CustomerId">
+                                    <i class="fas fa-user-circle me-1"></i> @(Model.Customer?.Name ?? "N/A")
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-muted fw-bold"><i class="fas fa-user-secret me-1"></i> Khách lẻ (Walk-in)</span>
+                            }
+                        </div>
+
+                        <div class="info-group">
+                            <label style="font-size: 0.75rem; color: #a0aec0; text-transform: uppercase; font-weight: 600; margin-bottom: 4px; display: block;">Số điện thoại</label>
+                            <span class="fw-bold text-dark"><i class="fas fa-phone me-1" style="color: #ff9966;"></i> @(Model.Customer?.Phone ?? "—")</span>
+                        </div>
+
+                        <div class="info-group">
+                            <label style="font-size: 0.75rem; color: #a0aec0; text-transform: uppercase; font-weight: 600; margin-bottom: 4px; display: block;">Địa chỉ giao hàng</label>
+                            <span class="fw-bold text-dark"><i class="fas fa-map-marker-alt me-1" style="color: #ff9966;"></i> @(Model.Customer?.Address ?? "—")</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-modern mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="ps-4" style="width:60px;">#</th>
+                                    <th>Sản phẩm</th>
+                                    <th class="text-center" style="width:100px;">SL</th>
+                                    <th class="text-end" style="width:150px;">Đơn giá</th>
+                                    <th class="text-end pe-4" style="width:150px;">Thành tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Items == null || Model.Items.Count == 0)
+                                {
+                                    <tr><td colspan="5" class="text-center py-4 text-muted">Không có sản phẩm nào.</td></tr>
+                                }
+                                else
+                                {
+                                    int stt = 1;
+                                    foreach (var it in Model.Items)
+                                    {
+                                        <tr>
+                                            <td class="ps-4 text-muted">@stt</td>
+                                            <td><div class="fw-bold text-dark">@(it.Product?.Name ?? "Sản phẩm không xác định")</div></td>
+                                            <td class="text-center fw-semibold">@it.Quantity</td>
+                                            <td class="text-end text-muted">@it.UnitPrice.ToString("N0")</td>
+                                            <td class="text-end pe-4 fw-bold">@it.LineTotal.ToString("N0")</td>
+                                        </tr>
+                                        stt++;
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            @if (Model.Status != InvoiceStatus.Cancelled)
+            {
+                <div class="card card-modern mt-4">
+                    <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+                        <h6 class="fw-bold text-dark"><i class="fas fa-wallet me-2 text-success"></i>Ghi nhận thanh toán</h6>
+                    </div>
+                    <div class="card-body px-4 pb-4">
+                        <form method="post" action="/Admin/Invoices/RecordPayment/@Model.Id" class="row g-3 align-items-end">
+                            @Html.AntiForgeryToken()
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted fw-bold">Số tiền thanh toán thêm</label>
+                                <div class="input-group">
+                                    <input class="form-control" type="number" name="amount" step="1000" min="0" required placeholder="Nhập số tiền..." />
+                                    <span class="input-group-text">VNĐ</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-success w-100 fw-bold" type="submit">Xác nhận</button>
+                            </div>
+                            <div class="col-md-3 text-muted small">
+                                Còn nợ: <strong class="text-danger h6">@due.ToString("N0") đ</strong>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="col-12 col-xl-4">
+            <div class="card card-modern mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4">Tổng thanh toán</h5>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Tổng tiền hàng:</span>
+                        <span class="fw-semibold">@Model.SubTotal.ToString("N0") đ</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                        <span class="fw-bold text-dark h5 mb-0">Tổng cộng:</span>
+                        <span class="fw-bold text-danger h4 mb-0">@Model.GrandTotal.ToString("N0") đ</span>
+                    </div>
+                    <div class="mt-4 pt-3 border-top border-dashed">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-success"><i class="fas fa-check-circle me-1"></i> Đã trả:</span>
+                            <span class="fw-bold text-success">@Model.PaidAmount.ToString("N0") đ</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-danger"><i class="fas fa-exclamation-circle me-1"></i> Còn nợ:</span>
+                            <span class="fw-bold text-danger">@due.ToString("N0") đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-info shadow-sm border-0 small rounded-3">
+                <i class="fas fa-info-circle me-2"></i>
+                Hóa đơn này đã trừ tồn kho sản phẩm.
+                Nếu hủy, tồn kho sẽ được hoàn trả lại.
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="customerHoverCard" class="customer-hover-card"></div>
+
+@section Scripts {
+    <script>
+        const customerHoverCard = document.getElementById('customerHoverCard');
+        const customerCache = new Map();
+
+        function escapeHtml(s) {
+            if (!s) return '';
+            return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+        }
+
+        function renderCustomerCard(data) {
+            if (!customerHoverCard) return;
+            customerHoverCard.innerHTML = `
+                <div class="title">${escapeHtml(data.name || 'Khách hàng')}</div>
+                <div class="line"><strong>SĐT:</strong> ${escapeHtml(data.phone || '—')}</div>
+                <div class="line"><strong>Email:</strong> ${escapeHtml(data.email || '—')}</div>
+                <div class="line"><strong>Địa chỉ:</strong> ${escapeHtml(data.address || '—')}</div>
+                <div class="muted mt-2">
+                    <span><strong>Tổng đơn:</strong> ${escapeHtml(data.totalOrders ?? '0')}</span>
+                    &nbsp;|&nbsp;
+                    <span><strong>Đã chi:</strong> ${escapeHtml(data.totalSpentText || '0 VNĐ')}</span>
+                </div>
+            `;
+        }
+
+        function placeCardNear(el) {
+            if (!customerHoverCard || !el) return;
+            const r = el.getBoundingClientRect();
+            const pad = 10;
+            let top = r.bottom + 8;
+            let left = Math.min(r.right - 300, window.innerWidth - 300 - pad);
+            if (left < pad) left = pad;
+            const estimatedHeight = 180;
+            if (top + estimatedHeight > window.innerHeight - pad) {
+                top = Math.max(pad, r.top - estimatedHeight - 8);
+            }
+            customerHoverCard.style.top = `${top}px`;
+            customerHoverCard.style.left = `${left}px`;
+        }
+
+        function showCard(el) {
+            if (!customerHoverCard) return;
+            placeCardNear(el);
+            customerHoverCard.style.display = 'block';
+        }
+
+        function hideCard() {
+            if (!customerHoverCard) return;
+            customerHoverCard.style.display = 'none';
+        }
+
+        async function loadCustomerQuickInfo(customerId) {
+            if (!customerId) return null;
+            if (customerCache.has(customerId)) return customerCache.get(customerId);
+            try {
+                const res = await fetch(`/Admin/Customers/QuickInfo/${customerId}`);
+                const data = await res.json();
+                if (data && data.success) {
+                    customerCache.set(customerId, data);
+                    return data;
+                }
+            } catch(e) { console.error(e); }
+            return null;
+        }
+
+        function bindHover(el, getCustomerId) {
+            if (!el) return;
+            let over = false;
+            let hideTimer = null;
+
+            const scheduleHide = () => {
+                if (hideTimer) clearTimeout(hideTimer);
+                hideTimer = setTimeout(() => { if (!over) hideCard(); }, 150);
+            };
+
+            el.addEventListener('mouseenter', async () => {
+                over = true;
+                const id = getCustomerId();
+                if (!id) return;
+                showCard(el);
+                customerHoverCard.innerHTML = `<div class="muted">Đang tải...</div>`;
+                const data = await loadCustomerQuickInfo(id);
+                if (data) {
+                    renderCustomerCard(data);
+                    placeCardNear(el);
+                }
+            });
+
+            el.addEventListener('mouseleave', () => { over = false; scheduleHide(); });
+            if (customerHoverCard) {
+                customerHoverCard.addEventListener('mouseenter', () => { over = true; if (hideTimer) clearTimeout(hideTimer); });
+                customerHoverCard.addEventListener('mouseleave', () => { over = false; scheduleHide(); });
+            }
+        }
+
+        const invoiceCustomerLink = document.getElementById('invoiceCustomerLink');
+        if (invoiceCustomerLink) {
+            bindHover(invoiceCustomerLink, () => invoiceCustomerLink.getAttribute('data-customer-id'));
+        }
+    </script>
+}

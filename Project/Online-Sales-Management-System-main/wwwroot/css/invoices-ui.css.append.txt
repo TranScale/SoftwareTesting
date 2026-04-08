@@ -1,0 +1,63 @@
+/* APPEND THIS BLOCK to the end of your existing file:
+   wwwroot/css/invoices-ui.css
+   (Do NOT overwrite your whole CSS if you have other styles.)
+*/
+
+/* =========================
+   CUSTOMER POPUP OVERLAY
+   - fixed
+   - z-index cao
+   - KHÔNG ảnh hưởng layout
+   ========================= */
+
+.customer-info-btn{
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.customer-info-popover,
+.customer-hover-card{
+  position: fixed;
+  display: none;
+  z-index: 9999;
+  width: 320px;
+  max-width: calc(100vw - 24px);
+  background: #fff;
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.12);
+}
+
+.customer-pop-title{
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: #111827;
+}
+
+.customer-pop-row{
+  font-size: 13px;
+  color: #4b5563;
+  line-height: 1.4;
+  margin: 2px 0;
+}
+
+.customer-pop-row b{
+  color: #111827;
+  font-weight: 600;
+}
+
+.customer-pop-arrow{
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #fff;
+  border-left: 1px solid rgba(0,0,0,.08);
+  border-top: 1px solid rgba(0,0,0,.08);
+  transform: rotate(45deg);
+  top: -6px;
+  left: 18px;
+}

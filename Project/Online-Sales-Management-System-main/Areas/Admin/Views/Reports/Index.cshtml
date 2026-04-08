@@ -1,0 +1,255 @@
+﻿@using System.Text.Json
+@model OnlineSalesManagementSystem.Areas.Admin.Controllers.ReportsController.ReportsIndexVm
+@{
+    ViewData["Title"] = "Executive Dashboard";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    // --- 1. XỬ LÝ DỮ LIỆU TỪ C# ---
+    var allDates = Model.Invoices.Select(i => AppTime.ToVietnamTime(i.InvoiceDate).Date)
+                    .Union(Model.Purchases.Select(p => p.PurchaseDate.Date))
+                    .Union(new[] { Model.From.Date, Model.To.Date })
+                    .Where(d => d >= Model.From.Date && d <= Model.To.Date)
+                    .Distinct().OrderBy(d => d).ToList();
+
+    // Chuẩn bị dữ liệu cho Chart
+    var labels = allDates.Select(d => d.ToString("dd/MM")).ToArray();
+    var dataSales = allDates.Select(d => Model.Invoices.Where(i => AppTime.ToVietnamTime(i.InvoiceDate).Date == d).Sum(x => x.GrandTotal)).ToArray();
+    var dataPurchases = allDates.Select(d => Model.Purchases.Where(p => p.PurchaseDate.Date == d).Sum(x => x.GrandTotal)).ToArray();
+
+    // Serialize data sang JSON
+    string jsonLabels = JsonSerializer.Serialize(labels);
+    string jsonSales = JsonSerializer.Serialize(dataSales);
+    string jsonPurchases = JsonSerializer.Serialize(dataPurchases);
+
+    // Tính % lợi nhuận biên
+    double margin = Model.SalesTotal > 0 ? (double)(Model.Profit / Model.SalesTotal) * 100 : 0;
+}
+
+<link rel="stylesheet" href="~/css/report-dashboard.css" asp-append-version="true" />
+
+<div class="container-fluid py-4 bg-light bg-opacity-50">
+    <div class="row align-items-end mb-4 g-3">
+        <div class="col-md-5">
+            <h3 class="dashboard-title mb-1">Báo Cáo và Thống Kê</h3>
+            <p class="text-muted mb-0 small">
+                Hiệu suất từ <span class="fw-bold text-dark">@Model.From.ToString("dd/MM/yyyy")</span> đến <span class="fw-bold text-dark">@Model.To.ToString("dd/MM/yyyy")</span>
+            </p>
+        </div>
+
+        <div class="col-md-7">
+            <form method="get" action="@Url.Action("Index")" id="filterForm" class="filter-bar d-flex flex-wrap gap-2 align-items-end shadow-sm">
+                <div class="btn-group me-2" role="group">
+                    <button type="button" class="btn btn-outline-secondary btn-sm small fw-bold" onclick="setDateRange('today')">Hôm nay</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm small fw-bold" onclick="setDateRange('thisMonth')">Tháng này</button>
+                </div>
+
+                <div class="flex-grow-1" style="min-width: 130px;">
+                    <label class="form-label small fw-bold text-secondary mb-1">Từ ngày</label>
+                    <input class="form-control form-control-sm" type="date" id="dateFrom" name="from" value="@Model.From.ToString("yyyy-MM-dd")" />
+                </div>
+                <div class="flex-grow-1" style="min-width: 130px;">
+                    <label class="form-label small fw-bold text-secondary mb-1">Đến ngày</label>
+                    <input class="form-control form-control-sm" type="date" id="dateTo" name="to" value="@Model.To.ToString("yyyy-MM-dd")" />
+                </div>
+
+                <div class="d-flex gap-1">
+                    <button class="btn btn-primary btn-sm fw-bold px-3" type="submit">
+                        <i class="fas fa-filter me-1"></i> Lọc
+                    </button>
+
+                    <button class="btn btn-success btn-sm fw-bold px-3" type="submit" formaction="@Url.Action("ExportExcel")">
+                        <i class="fas fa-file-excel me-1"></i> Xuất Excel
+                    </button>
+
+                    <a class="btn btn-light btn-sm border px-3" href="/Admin/Reports"><i class="fas fa-undo"></i></a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row mb-4 g-3">
+        <div class="col-md-4">
+            <div class="card card-modern p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <div class="stat-label">Tổng Doanh Thu</div>
+                        <h3 class="stat-value">@Model.SalesTotal.ToString("N0")</h3>
+                    </div>
+                    <div class="stat-icon sales"><i class="fas fa-hand-holding-usd"></i></div>
+                </div>
+                <small class="text-success fw-bold"><i class="fas fa-arrow-up me-1"></i> Thu nhập</small>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-modern p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <div class="stat-label">Tổng Chi Phí</div>
+                        <h3 class="stat-value">@Model.PurchaseTotal.ToString("N0")</h3>
+                    </div>
+                    <div class="stat-icon cost"><i class="fas fa-shopping-cart"></i></div>
+                </div>
+                <small class="text-danger fw-bold"><i class="fas fa-arrow-down me-1"></i> Chi tiêu</small>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-modern p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <div class="stat-label">Lợi Nhuận Ròng</div>
+                        <h3 class="stat-value @(Model.Profit >= 0 ? "text-primary" : "text-danger")">@Model.Profit.ToString("N0")</h3>
+                    </div>
+                    <div class="stat-icon profit"><i class="fas fa-chart-pie"></i></div>
+                </div>
+                <small class="text-primary fw-bold">~@margin.ToString("N1")% Biên lợi nhuận</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card card-modern">
+                <div class="card-header-clean">
+                    <h6 class="fw-bold m-0 text-dark"><i class="fas fa-chart-bar me-2 text-primary"></i>Biểu đồ Thu vs Chi</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="comparisonChart" style="max-height: 350px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-xl-6">
+            <div class="card card-modern h-100">
+                <div class="card-header-clean d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold m-0"><i class="fas fa-file-invoice text-success me-2"></i>Hóa đơn gần đây</h6>
+                    <a href="/Admin/Invoices" class="btn btn-sm btn-light rounded-pill px-3 small">Xem tất cả</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-modern align-middle table-hover mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4 border-0">Mã HĐ</th>
+                                <th class="border-0">Khách hàng</th>
+                                <th class="text-end border-0">Số tiền</th>
+                                <th class="text-center border-0">Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody class="border-top-0">
+                            @if (Model.Invoices.Count == 0)
+                            {
+                                <tr><td colspan="4" class="text-center py-4 text-muted">Không có dữ liệu.</td></tr>
+                            }
+                            @foreach (var inv in Model.Invoices.Take(10))
+                            {
+                                <tr>
+                                    <td class="ps-4 fw-bold text-dark">
+                                        <a href="/Admin/Invoices/Details/@inv.Id" class="text-decoration-none">@inv.InvoiceNo</a>
+                                    </td>
+                                    <td>@(inv.Customer?.Name ?? "Khách lẻ")</td>
+                                    <td class="text-end fw-bold text-success">@inv.GrandTotal.ToString("N0")</td>
+                                    <td class="text-center"><span class="badge rounded-pill @GetStatusColor(inv.Status)">@inv.Status</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-6">
+            <div class="card card-modern h-100">
+                <div class="card-header-clean d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold m-0"><i class="fas fa-truck text-danger me-2"></i>Đơn nhập gần đây</h6>
+                    <a href="/Admin/Purchases" class="btn btn-sm btn-light rounded-pill px-3 small">Xem tất cả</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-modern align-middle table-hover mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4 border-0">Mã PO</th>
+                                <th class="border-0">Nhà cung cấp</th>
+                                <th class="text-end border-0">Số tiền</th>
+                                <th class="text-center border-0">Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody class="border-top-0">
+                            @if (Model.Purchases.Count == 0)
+                            {
+                                <tr><td colspan="4" class="text-center py-4 text-muted">Không có dữ liệu.</td></tr>
+                            }
+                            @foreach (var po in Model.Purchases.Take(10))
+                            {
+                                <tr>
+                                    <td class="ps-4 fw-bold text-dark">
+                                        <a href="/Admin/Purchases/Details/@po.Id" class="text-decoration-none">@po.PurchaseNo</a>
+                                    </td>
+                                    <td>@(po.Supplier?.Name ?? "-")</td>
+                                    <td class="text-end fw-bold text-danger">@po.GrandTotal.ToString("N0")</td>
+                                    <td class="text-center"><span class="badge rounded-pill @GetStatusColor(po.Status)">@po.Status</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetStatusColor(object status)
+    {
+        if (status == null) return "bg-secondary";
+        var s = (status.ToString() ?? string.Empty).ToLowerInvariant();
+        if (s.Contains("paid") || s.Contains("complete") || s.Contains("received")) return "bg-success bg-opacity-75";
+        if (s.Contains("pending") || s.Contains("wait") || s.Contains("process")) return "bg-warning text-dark";
+        if (s.Contains("cancel") || s.Contains("return") || s.Contains("fail")) return "bg-danger";
+        return "bg-secondary";
+    }
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/js/report-dashboard.js" asp-append-version="true"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // 1. Khởi tạo biểu đồ
+            if (typeof initComparisonChart === 'function') {
+                initComparisonChart(
+                    'comparisonChart',
+                    @Html.Raw(jsonLabels),
+                    @Html.Raw(jsonSales),
+                    @Html.Raw(jsonPurchases)
+                );
+            }
+
+            // 2. Hàm xử lý nút chọn nhanh ngày (Today, This Month)
+            window.setDateRange = function(type) {
+                const today = new Date();
+                const inputFrom = document.getElementById('dateFrom');
+                const inputTo = document.getElementById('dateTo');
+
+                // Hàm format YYYY-MM-DD
+                const formatDate = (date) => {
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                };
+
+                if (type === 'today') {
+                    inputFrom.value = formatDate(today);
+                    inputTo.value = formatDate(today);
+                } else if (type === 'thisMonth') {
+                    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+                    inputFrom.value = formatDate(firstDay);
+                    inputTo.value = formatDate(today);
+                }
+                 document.getElementById('filterForm').submit();
+            }
+        });
+    </script>
+}

@@ -1,0 +1,426 @@
+@model OnlineSalesManagementSystem.Areas.Admin.Controllers.InvoicesController.InvoiceCreateVm
+@using OnlineSalesManagementSystem.Domain.Entities
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Tạo hóa đơn";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    var customers = ViewBag.Customers as List<Customer> ?? new();
+    var products = ViewBag.Products as List<Product> ?? new();
+    string displayInvoiceDate = Model.InvoiceDate.ToString("HH:mm dd/MM/yyyy");
+    string postInvoiceDate = Model.InvoiceDate.ToString("yyyy-MM-ddTHH:mm");
+}
+
+<link rel="stylesheet" href="~/css/invoices-ui.css" />
+
+<style>
+    /* Ghi đè hiển thị Grid trong cột hẹp của trang Create */
+    .customer-info-create .customer-detail-box {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        background: #fdfdfd;
+        padding: 15px;
+        margin-top: 10px;
+        border: 1px dashed #d1d3e2; /* Viền nét đứt tạo cảm giác "vùng thông tin phụ" */
+    }
+
+    .customer-info-create .info-group label {
+        font-size: 0.7rem;
+        margin-bottom: 2px;
+    }
+
+    .customer-info-create .info-group span {
+        font-size: 0.95rem;
+    }
+</style>
+
+<div class="container-fluid py-4" style="background-color: #f8f9fc;">
+    <div class="hero-header d-flex justify-content-between align-items-center mb-4">
+        <i class="fas fa-shopping-basket hero-icon-bg"></i>
+        <div style="z-index: 1;">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-custom mb-2">
+                    <li class="breadcrumb-item"><a href="/Admin/Invoices">Hóa đơn</a></li>
+                    <li class="breadcrumb-item active">Tạo mới</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold text-dark mb-0">Tạo hóa đơn bán hàng</h2>
+        </div>
+        <div style="z-index: 1;">
+            <a href="/Admin/Invoices" class="btn btn-outline-secondary rounded-pill px-4">
+                <i class="fas fa-arrow-left me-2"></i>Quay lại
+            </a>
+        </div>
+    </div>
+
+    <form asp-area="Admin" asp-controller="Invoices" asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" id="invoiceDatePost" name="InvoiceDate" value="@postInvoiceDate" />
+
+        <div class="row g-4">
+            <div class="col-12">
+                <div class="card card-modern p-4">
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger shadow-sm border-0 rounded-3 mb-4">
+                            @Html.ValidationSummary(excludePropertyErrors: true)
+                        </div>
+                    }
+
+                    <div class="row g-4">
+                        <div class="col-md-6 customer-info-create">
+                            <label class="form-label fw-bold text-muted text-uppercase small">Khách hàng</label>
+
+                            <select class="form-select form-select-lg shadow-none border-secondary-subtle" id="customerSelect" name="CustomerId">
+                                <option value="" data-walkin="1">-- Khách lẻ (Walk-in) --</option>
+                                @foreach (var c in customers)
+                                {
+                                    <option value="@c.Id"
+                                            data-name="@c.Name"
+                                            data-phone="@c.Phone"
+                                            data-email="@c.Email"
+                                            data-address="@c.Address">
+                                        @c.Name (@c.Phone)
+                                    </option>
+                                }
+                            </select>
+
+                            <div id="customerDetailContainer" style="display:none;">
+                                <div class="customer-detail-box rounded-3">
+                                    <div class="info-group">
+                                        <label class="text-uppercase text-muted fw-bold">Số điện thoại</label>
+                                        <span class="fw-bold text-dark"><i class="fas fa-phone me-2 text-warning"></i><span id="displayPhone"></span></span>
+                                    </div>
+                                    <div class="info-group">
+                                        <label class="text-uppercase text-muted fw-bold">Email</label>
+                                        <span class="fw-bold text-dark"><i class="fas fa-envelope me-2 text-warning"></i><span id="displayEmail"></span></span>
+                                    </div>
+                                    <div class="info-group">
+                                        <label class="text-uppercase text-muted fw-bold">Địa chỉ</label>
+                                        <span class="fw-bold text-dark"><i class="fas fa-map-marker-alt me-2 text-warning"></i><span id="displayAddress"></span></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-muted text-uppercase small">Ngày tạo đơn</label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-light border-secondary-subtle"><i class="far fa-calendar-alt text-muted"></i></span>
+                                <input class="form-control bg-white text-dark fw-bold border-secondary-subtle" type="text" id="invoiceDateDisplay" value="@displayInvoiceDate" readonly />
+                            </div>
+                            <div class="form-text mt-2"><i class="fas fa-clock me-1"></i> Thời gian được cập nhật tự động theo máy chủ.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="card card-modern">
+                    <div class="card-header bg-white border-bottom-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0 text-danger"><i class="fas fa-list-ul me-2"></i>Danh sách sản phẩm</h5>
+                        <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="addRow()">
+                            <i class="fas fa-plus me-1"></i> Thêm dòng
+                        </button>
+                    </div>
+
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-modern mb-0" id="itemsTable">
+                                <thead>
+                                    <tr>
+                                        <th class="ps-4" style="min-width: 300px;">Sản phẩm</th>
+                                        <th class="text-center" style="width: 100px;">SL</th>
+                                        <th style="width: 180px;">Đơn giá (VNĐ)</th>
+                                        <th class="text-center" style="width: 120px;">Kho</th>
+                                        <th class="text-end pe-4" style="width: 180px;">Thành tiền</th>
+                                        <th class="text-center" style="width: 60px;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        var rows = (Model.Items?.Any() == true) ? Model.Items : new List<OnlineSalesManagementSystem.Areas.Admin.Controllers.InvoicesController.InvoiceItemVm> { new() { Qty = 1 } };
+                                    }
+
+                                    @for (var i = 0; i < rows.Count; i++)
+                                    {
+                                        <tr class="item-row">
+                                            <td class="ps-4">
+                                                <select class="form-select table-input product-select" name="Items[@i].ProductId" required>
+                                                    <option value="">-- Chọn sản phẩm --</option>
+                                                    @foreach (var p in products)
+                                                    {
+                                                        var selected = (rows[i].ProductId == p.Id) ? "selected" : null;
+                                                        <option value="@p.Id" selected="@selected"
+                                                                data-price="@p.SalePrice.ToString(CultureInfo.InvariantCulture)"
+                                                                data-stock="@p.StockOnHand"
+                                                                data-reorder="@p.ReorderLevel">
+                                                            @p.Name (@p.SKU)
+                                                        </option>
+                                                    }
+                                                </select>
+                                            </td>
+
+                                            <td class="text-center">
+                                                <input class="table-input text-center fw-bold qty-input"
+                                                       type="number" min="1" step="1"
+                                                       name="Items[@i].Qty"
+                                                       value="@(rows[i].Qty <= 0 ? 1 : rows[i].Qty)" required />
+                                            </td>
+
+                                            <td>
+                                                <div class="input-group input-group-sm">
+                                                    <input class="form-control table-input text-end unitprice-input" type="text" readonly />
+                                                    <span class="input-group-text bg-white border-start-0 text-muted small">đ</span>
+                                                </div>
+                                                <input type="hidden" class="unitprice-hidden" name="Items[@i].UnitPrice" value="@rows[i].UnitPrice" />
+                                            </td>
+
+                                            <td class="text-center">
+                                                <span class="stock-remaining badge rounded-pill px-3 bg-light text-dark border">0</span>
+                                            </td>
+
+                                            <td class="text-end pe-4 fw-bold line-total">0</td>
+
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-sm text-danger hover-scale" onclick="removeRow(this)">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="px-4 py-3 bg-light border-top border-dashed">
+                            <div class="d-flex align-items-center text-warning-emphasis">
+                                <i class="fas fa-exclamation-triangle fa-lg me-3"></i>
+                                <div class="small">
+                                    <strong>Lưu ý quan trọng:</strong> Hóa đơn sau khi lưu sẽ tự động <strong>trừ tồn kho</strong>.<br />
+                                    Vui lòng kiểm tra kỹ số lượng thực tế.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 d-flex justify-content-end gap-3 pb-5">
+                <a class="btn btn-light rounded-pill px-4 fw-bold border" href="/Admin/Invoices">Hủy bỏ</a>
+                <button type="submit" class="btn btn-gradient rounded-pill px-5 shadow-sm fw-bold text-white">
+                    <i class="fas fa-save me-2"></i> Lưu hóa đơn
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script type="text/template" id="productOptionsTemplate">
+    @foreach (var p in products)
+    {
+            <text>
+            <option value="@p.Id"
+                    data-price="@p.SalePrice.ToString(CultureInfo.InvariantCulture)"
+                    data-stock="@p.StockOnHand"
+                    data-reorder="@p.ReorderLevel">
+                @p.Name (@p.SKU)
+            </option>
+            </text>
+    }
+</script>
+
+@section Scripts {
+    <script>
+        // =====================
+        // 1. Xử lý hiển thị thông tin khách hàng (Mới)
+        // =====================
+        function initCustomerInfoDisplay() {
+            const select = document.getElementById('customerSelect');
+            const container = document.getElementById('customerDetailContainer');
+
+            // Các trường hiển thị
+            const dPhone = document.getElementById('displayPhone');
+            const dEmail = document.getElementById('displayEmail');
+            const dAddress = document.getElementById('displayAddress');
+
+            function update() {
+                const opt = select.options[select.selectedIndex];
+                // Kiểm tra xem có phải khách lẻ hoặc chưa chọn không
+                const isWalkin = !opt || opt.dataset.walkin === "1" || !select.value;
+
+                if (isWalkin) {
+                    // Ẩn khung thông tin nếu là khách lẻ
+                    container.style.display = 'none';
+                } else {
+                    // Hiện khung và điền dữ liệu
+                    container.style.display = 'block';
+                    dPhone.textContent = opt.dataset.phone || '—';
+                    dEmail.textContent = opt.dataset.email || '—';
+                    dAddress.textContent = opt.dataset.address || '—';
+                }
+            }
+
+            select.addEventListener('change', update);
+            update(); // Chạy lần đầu khi trang tải
+        }
+
+        // =====================
+        // 2. Xử lý Thời gian (Giữ nguyên)
+        // =====================
+        function pad2(n) { return String(n).padStart(2, '0'); }
+
+        function nowPostValue() {
+            const d = new Date();
+            const yyyy = d.getFullYear();
+            const MM = pad2(d.getMonth() + 1);
+            const dd = pad2(d.getDate());
+            const hh = pad2(d.getHours());
+            const mm = pad2(d.getMinutes());
+            return `${yyyy}-${MM}-${dd}T${hh}:${mm}`;
+        }
+
+        function nowDisplayValue() {
+            const d = new Date();
+            return `${pad2(d.getHours())}:${pad2(d.getMinutes())} ${pad2(d.getDate())}/${pad2(d.getMonth() + 1)}/${d.getFullYear()}`;
+        }
+
+        function syncInvoiceTime() {
+            const post = document.getElementById('invoiceDatePost');
+            const dis = document.getElementById('invoiceDateDisplay');
+            if (post) post.value = nowPostValue();
+            if (dis) dis.value = nowDisplayValue();
+        }
+
+        // =====================
+        // 3. Tính toán tiền & dòng (Giữ nguyên logic)
+        // =====================
+        const money = (n) => Number(n || 0).toLocaleString('vi-VN');
+
+        function calcRow(tr) {
+            const sel = tr.querySelector('.product-select');
+            const qtyEl = tr.querySelector('.qty-input');
+            const unitEl = tr.querySelector('.unitprice-input');
+            const unitHidden = tr.querySelector('.unitprice-hidden');
+            const totalEl = tr.querySelector('.line-total');
+            const stockBadge = tr.querySelector('.stock-remaining');
+
+            if (!sel || !qtyEl) return;
+
+            const opt = sel.options[sel.selectedIndex];
+            const price = opt ? Number(opt.dataset.price || 0) : 0;
+            const stock = opt ? Number(opt.dataset.stock || 0) : 0;
+            const reorder = opt ? Number(opt.dataset.reorder || 0) : 0;
+            const qty = Math.max(1, Number(qtyEl.value || 1));
+
+            qtyEl.value = qty; // Reset nếu nhập < 1
+
+            if (unitEl) unitEl.value = money(price);
+            if (unitHidden) unitHidden.value = price;
+            const line = price * qty;
+            if (totalEl) totalEl.textContent = `${money(line)}`;
+
+            const remain = Math.max(0, stock - qty);
+
+            tr.classList.remove('row-stock-warn', 'row-stock-danger');
+            if (stockBadge) {
+                stockBadge.textContent = remain;
+                stockBadge.className = 'stock-remaining badge rounded-pill px-3 border'; // Reset class
+
+                if (stock <= 0 || remain <= 0) {
+                    stockBadge.classList.add('bg-danger-subtle', 'text-danger', 'border-danger');
+                    tr.classList.add('row-stock-danger');
+                } else if (remain <= reorder) {
+                    stockBadge.classList.add('bg-warning-subtle', 'text-warning', 'border-warning');
+                    tr.classList.add('row-stock-warn');
+                } else {
+                    stockBadge.classList.add('bg-success-subtle', 'text-success', 'border-success');
+                }
+            }
+        }
+
+        function bindRow(tr) {
+            const sel = tr.querySelector('.product-select');
+            const qty = tr.querySelector('.qty-input');
+
+            if (sel) sel.addEventListener('change', () => calcRow(tr));
+            if (qty) qty.addEventListener('input', () => calcRow(tr));
+            calcRow(tr);
+        }
+
+        function reindex() {
+            const tbody = document.querySelector('#itemsTable tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            rows.forEach((tr, idx) => {
+                tr.querySelectorAll('select, input').forEach(el => {
+                    const name = el.getAttribute('name');
+                    if (!name) return;
+                    el.setAttribute('name', name.replace(/Items\[\d+\]/, `Items[${idx}]`));
+                });
+            });
+        }
+
+        function getProductOptionsHtml() {
+            return document.getElementById('productOptionsTemplate').innerHTML;
+        }
+
+        window.addRow = function () {
+            const tbody = document.querySelector('#itemsTable tbody');
+            const idx = tbody.querySelectorAll('tr').length;
+            const tr = document.createElement('tr');
+            tr.className = 'item-row';
+            tr.innerHTML = `
+                <td class="ps-4">
+                  <select class="form-select table-input product-select" name="Items[${idx}].ProductId" required>
+                    <option value="">-- Chọn sản phẩm --</option>
+                    ${getProductOptionsHtml()}
+                  </select>
+                </td>
+                <td class="text-center">
+                  <input class="table-input text-center fw-bold qty-input" type="number" min="1" step="1" name="Items[${idx}].Qty" value="1" required />
+                </td>
+                <td>
+                  <div class="input-group input-group-sm">
+                    <input class="form-control table-input text-end unitprice-input" type="text" readonly />
+                    <span class="input-group-text bg-white border-start-0 text-muted small">đ</span>
+                  </div>
+                  <input type="hidden" class="unitprice-hidden" name="Items[${idx}].UnitPrice" value="0" />
+                </td>
+                <td class="text-center">
+                  <span class="stock-remaining badge rounded-pill px-3 bg-light text-dark border">0</span>
+                </td>
+                <td class="text-end pe-4 fw-bold line-total">0</td>
+                <td class="text-center">
+                  <button type="button" class="btn btn-sm text-danger hover-scale" onclick="removeRow(this)">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+            bindRow(tr);
+            reindex();
+        }
+
+        window.removeRow = function (btn) {
+            const tr = btn.closest('tr');
+            if (!tr) return;
+            tr.remove();
+            const tbody = document.querySelector('#itemsTable tbody');
+            if (tbody.querySelectorAll('tr').length === 0) addRow();
+            reindex();
+        }
+
+        // =====================
+        // Init
+        // =====================
+        document.addEventListener('DOMContentLoaded', function () {
+            syncInvoiceTime();
+            setInterval(syncInvoiceTime, 60000);
+            document.querySelectorAll('#itemsTable tbody tr').forEach(bindRow);
+
+            // Khởi tạo hiển thị thông tin khách hàng
+            initCustomerInfoDisplay();
+        });
+    </script>
+}

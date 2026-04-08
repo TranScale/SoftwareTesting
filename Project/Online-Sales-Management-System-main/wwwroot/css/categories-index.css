@@ -1,0 +1,251 @@
+﻿/* --- 1. Cấu trúc chung & Card --- */
+.card-modern {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); /* Bóng đổ mềm */
+    background: #ffffff;
+    overflow: hidden;
+}
+
+/* --- 2. Hero Header Block (Phần đầu trang mới) --- */
+.hero-header {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    border: 1px solid rgba(0,0,0,0.02);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+    /* Đường viền trang trí Gradient bên trái */
+    .hero-header::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 6px;
+        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+    }
+
+/* Icon chìm trang trí (Watermark) */
+.hero-icon-bg {
+    position: absolute;
+    right: -20px;
+    bottom: -20px;
+    font-size: 8rem;
+    color: rgba(0,0,0,0.03); /* Rất mờ */
+    transform: rotate(-15deg);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Breadcrumb nhỏ gọn */
+.breadcrumb-custom {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+    .breadcrumb-custom a {
+        color: #6c757d;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+        .breadcrumb-custom a:hover {
+            color: #667eea;
+        }
+
+    .breadcrumb-custom .active {
+        color: #a0aec0;
+    }
+
+/* Badge hiển thị số lượng */
+.stat-badge {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* --- 3. Nút bấm Gradient (Thêm mới) --- */
+.btn-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+    .btn-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(118, 75, 162, 0.4);
+        color: white;
+    }
+
+/* --- 4. Bảng Hiện đại (Table) --- */
+.table-modern thead th {
+    background-color: #f8f9fc;
+    color: #5a5c69;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    border-bottom: 2px solid #e3e6f0;
+    padding: 1.2rem 1rem;
+}
+
+.table-modern tbody td {
+    vertical-align: middle;
+    padding: 1.2rem 1rem;
+    color: #343a40;
+    border-bottom: 1px solid #f1f3f5;
+    font-size: 0.95rem;
+}
+
+.table-modern tbody tr {
+    transition: all 0.2s ease;
+}
+
+    .table-modern tbody tr:hover {
+        background-color: #fdfeff;
+        transform: scale(1.002);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+        z-index: 2;
+        position: relative;
+    }
+
+/* ID Badge */
+.id-badge {
+    background: #eef2f7;
+    color: #555;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+/* --- 5. Toggle Switch (iOS Style) --- */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 26px;
+}
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #e9ecef;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 20px;
+        width: 20px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+input:checked + .toggle-slider {
+    background: linear-gradient(135deg, #2af598 0%, #009efd 100%);
+}
+
+    input:checked + .toggle-slider:before {
+        transform: translateX(22px);
+    }
+
+/* --- 6. Action Buttons (Tròn) --- */
+.btn-icon {
+    width: 35px;
+    height: 35px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s;
+    background: #fff;
+    border: 1px solid #e3e6f0;
+    color: #6e707e;
+}
+
+    .btn-icon:hover {
+        border-color: transparent;
+        color: #fff;
+        transform: rotate(15deg);
+    }
+
+    .btn-icon.edit:hover {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        box-shadow: 0 4px 10px rgba(118, 75, 162, 0.3);
+    }
+
+    .btn-icon.delete:hover {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5253 100%);
+        box-shadow: 0 4px 10px rgba(238, 82, 83, 0.3);
+    }
+
+/* --- 7. Toast Notification --- */
+#toast-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 9999;
+}
+
+.toast-msg {
+    background: white;
+    color: #333;
+    padding: 16px 24px;
+    border-radius: 12px;
+    margin-top: 10px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    border-left: 5px solid #2ecc71;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+    animation: slideIn 0.4s forwards;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}

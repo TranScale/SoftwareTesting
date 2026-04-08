@@ -1,0 +1,81 @@
+﻿@model OnlineSalesManagementSystem.Domain.Entities.Category
+@{
+    ViewData["Title"] = "Chỉnh sửa Danh mục";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/categories-form.css" />
+
+<div class="container-fluid py-4" style="background-color: #f8f9fc;">
+
+    <div class="hero-header d-flex justify-content-between align-items-center">
+        <i class="fas fa-edit hero-icon-bg"></i>
+        <div style="z-index: 1;">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-custom mb-2">
+                    <li class="breadcrumb-item"><a href="/Admin/Home">Trang chủ</a></li>
+                    <li class="breadcrumb-item"><a href="/Admin/Categories">Danh mục</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Chỉnh sửa</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold text-dark mb-0">Chỉnh sửa Danh mục</h2>
+            <p class="text-muted mt-1 mb-0 small">Cập nhật thông tin cho danh mục: <strong>@Model.Name</strong></p>
+        </div>
+        <div style="z-index: 1;">
+            <a href="/Admin/Categories" class="btn btn-light-custom shadow-sm">
+                <i class="fas fa-arrow-left me-2"></i>Quay lại
+            </a>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+            <div class="card card-modern">
+                <div class="card-body">
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger shadow-sm border-0" style="border-radius: 10px;">
+                            @Html.ValidationSummary(excludePropertyErrors: false)
+                        </div>
+                    }
+
+                    <form method="post" action="/Admin/Categories/Edit" class="row g-4">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="Id" value="@Model.Id" />
+
+                        <div class="col-12">
+                            <label class="form-label">Tên danh mục <span class="text-danger">*</span></label>
+                            <input class="form-control form-control-lg" name="Name" value="@Model.Name" maxlength="120" required />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Mô tả</label>
+                            <textarea class="form-control" name="Description" rows="4">@Model.Description</textarea>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="p-3 bg-light rounded-3 d-flex align-items-center">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="IsTrending" name="IsTrending" value="true" @(Model.IsTrending ? "checked" : "")>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <input name="IsTrending" type="hidden" value="false">
+                                <div>
+                                    <label class="fw-bold mb-0 text-dark" for="IsTrending" style="cursor:pointer;">Trending Category</label>
+                                    <div class="text-muted small">Bật để hiển thị danh mục này lên trang chủ cửa hàng.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 d-flex gap-3 mt-4 justify-content-end">
+                            <a href="/Admin/Categories" class="btn btn-light-custom">Hủy bỏ</a>
+                            <button type="submit" class="btn btn-gradient shadow-lg px-5">
+                                <i class="fas fa-save me-2"></i>Lưu thay đổi
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

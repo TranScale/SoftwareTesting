@@ -1,0 +1,75 @@
+PATCH cho Areas/Admin/Views/Invoices/Details.cshtml
+
+1) Ở khu vực hiển thị khách hàng (đang viết kiểu: "Khách hàng: ..."), thay bằng block sau:
+
+@{
+    var c = Model.Customer; // đảm bảo controller Include(Customer)
+}
+
+<div class="d-flex align-items-center gap-2">
+  <div class="text-muted small">Khách hàng:</div>
+
+  @if (c != null)
+  {
+    <a href="/Admin/Customers/Details/@c.Id"
+       class="customer-link fw-semibold"
+       data-cname="@c.Name"
+       data-cphone="@c.Phone"
+       data-cemail="@c.Email"
+       data-caddress="@c.Address">
+      @c.Name
+    </a>
+  }
+  else
+  {
+    <span class="text-muted">Walk-in</span>
+  }
+</div>
+
+<div id="customerHoverCard" class="customer-hover-card shadow-sm">
+  <div class="fw-bold mb-1" id="chName"></div>
+  <div class="small text-muted" id="chPhone"></div>
+  <div class="small text-muted" id="chEmail"></div>
+  <div class="small text-muted" id="chAddress"></div>
+</div>
+
+2) Thêm JS dưới đây vào cuối file (trong @section Scripts hoặc cuối body):
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const card = document.getElementById('customerHoverCard');
+    const nameEl = document.getElementById('chName');
+    const phoneEl = document.getElementById('chPhone');
+    const emailEl = document.getElementById('chEmail');
+    const addrEl  = document.getElementById('chAddress');
+
+    const link = document.querySelector('.customer-link');
+    if (!link || !card) return;
+
+    const fill = () => {
+      nameEl.textContent  = link.dataset.cname || '';
+      phoneEl.textContent = link.dataset.cphone ? `📞 ${link.dataset.cphone}` : '';
+      emailEl.textContent = link.dataset.cemail ? `✉️ ${link.dataset.cemail}` : '';
+      addrEl.textContent  = link.dataset.caddress ? `📍 ${link.dataset.caddress}` : '';
+    };
+
+    let hideT;
+    const show = () => {
+      clearTimeout(hideT);
+      fill();
+      const r = link.getBoundingClientRect();
+      card.style.left = (r.left + window.scrollX) + 'px';
+      card.style.top  = (r.bottom + window.scrollY + 8) + 'px';
+      card.style.display = 'block';
+    };
+    const hide = () => { card.style.display = 'none'; };
+
+    link.addEventListener('mouseenter', show);
+    link.addEventListener('mouseleave', () => hideT = setTimeout(hide, 150));
+    card.addEventListener('mouseenter', () => clearTimeout(hideT));
+    card.addEventListener('mouseleave', () => hideT = setTimeout(hide, 150));
+  });
+</script>
+
+3) CSS:
+- Copy phần customer-hover-card trong file wwwroot/css/invoices-ui.patch.css và dán vào cuối invoices-ui.css

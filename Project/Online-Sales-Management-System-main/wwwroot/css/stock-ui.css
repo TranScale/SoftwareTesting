@@ -1,0 +1,172 @@
+﻿/* File: wwwroot/css/stock-ui.css */
+
+/* --- 1. Hero Header (Theme Indigo) --- */
+.hero-header {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    border: 1px solid rgba(0,0,0,0.02);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+    .hero-header::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 6px;
+        /* Gradient Indigo */
+        background: linear-gradient(180deg, #4e54c8 0%, #8f94fb 100%);
+    }
+
+.hero-icon-bg {
+    position: absolute;
+    right: -20px;
+    bottom: -20px;
+    font-size: 8rem;
+    color: rgba(0,0,0,0.03);
+    transform: rotate(-15deg);
+    pointer-events: none;
+}
+
+/* Breadcrumb & Stats */
+.breadcrumb-custom {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+    .breadcrumb-custom a {
+        color: #6c757d;
+        text-decoration: none;
+    }
+
+        .breadcrumb-custom a:hover {
+            color: #4e54c8;
+        }
+
+    .breadcrumb-custom .active {
+        color: #a0aec0;
+    }
+
+.stat-badge {
+    background: rgba(78, 84, 200, 0.1);
+    color: #4e54c8;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* --- 2. Card & Table --- */
+.card-modern {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    background: #ffffff;
+    overflow: hidden;
+}
+
+.table-modern thead th {
+    background-color: #f0f0ff; /* Nền tím nhạt */
+    color: #5a5c69;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    border-bottom: 2px solid #e0e0fa;
+    padding: 1.2rem 1rem;
+}
+
+.table-modern tbody td {
+    vertical-align: middle;
+    padding: 1rem;
+    color: #343a40;
+    border-bottom: 1px solid #f1f3f5;
+    font-size: 0.95rem;
+}
+
+.table-modern tbody tr:hover {
+    background-color: #f8f8ff;
+    transition: all 0.2s ease;
+}
+
+/* Row highlight for Low Stock */
+.row-low-stock {
+    background-color: #fffbef !important; /* Vàng nhạt */
+}
+
+    .row-low-stock td:first-child {
+        border-left: 4px solid #ffc107;
+    }
+
+/* --- 3. Badges (Movement Types) --- */
+.badge-move {
+    padding: 0.5em 0.8em;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+}
+
+.move-in {
+    background: #d1e7dd;
+    color: #0f5132;
+    border: 1px solid #badbcc;
+}
+/* Xanh lá */
+.move-out {
+    background: #f8d7da;
+    color: #842029;
+    border: 1px solid #f5c2c7;
+}
+/* Đỏ */
+.move-adj {
+    background: #e2e3e5;
+    color: #41464b;
+    border: 1px solid #d3d6d8;
+}
+/* Xám */
+
+/* --- 4. Buttons --- */
+.btn-gradient {
+    background: linear-gradient(135deg, #4e54c8 0%, #8f94fb 100%);
+    border: none;
+    color: white;
+    transition: all 0.2s;
+}
+
+    .btn-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(78, 84, 200, 0.4);
+        color: white;
+    }
+
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid #e3e6f0;
+    color: #6e707e;
+    transition: all 0.2s;
+}
+
+    .btn-icon:hover {
+        border-color: transparent;
+        color: #fff;
+        background: #4e54c8;
+    }

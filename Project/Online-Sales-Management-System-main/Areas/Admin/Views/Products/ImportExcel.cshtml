@@ -1,0 +1,50 @@
+@{
+    ViewData["Title"] = "Nhập sản phẩm từ Excel";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4" style="background-color:#f8f9fc;">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white border-0 pt-4 px-4">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                <div>
+                    <h3 class="fw-bold mb-1">Nhập sản phẩm bằng Excel</h3>
+                    <div class="text-muted">Upload file .xlsx, hệ thống sẽ hiển thị bảng xem trước trước khi import vào database.</div>
+                </div>
+                <div class="d-flex gap-2">
+                    <a class="btn btn-outline-primary" href="/Admin/Products/ExportExcelTemplate">
+                        <i class="fas fa-download me-1"></i> Tải file mẫu
+                    </a>
+                    <a class="btn btn-outline-secondary" href="/Admin/Products">
+                        <i class="fas fa-arrow-left me-1"></i> Quay lại
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body px-4 pb-4">
+            <div class="alert alert-info">
+                <div class="fw-semibold mb-1">Gợi ý cột trong Excel</div>
+                <div class="small">
+                    Bắt buộc: <b>SKU</b>, <b>Name</b>. Các cột khác tùy chọn: CategoryId/CategoryName, UnitId/UnitName, BrandId/BrandName,
+                    CostPrice, SalePrice, StockOnHand, ReorderLevel, IsActive, IsTrending, ImagePath, Description, Content.
+                </div>
+            </div>
+
+            <form method="post" action="/Admin/Products/ImportExcelPreview" enctype="multipart/form-data" class="mt-3">
+                @Html.AntiForgeryToken()
+                <div class="row g-3 align-items-end">
+                    <div class="col-12 col-lg-7">
+                        <label class="form-label fw-semibold">Chọn file Excel (.xlsx)</label>
+                        <input type="file" name="file" class="form-control" accept=".xlsx" required />
+                    </div>
+                    <div class="col-12 col-lg-5">
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="fas fa-table me-1"></i> Xem trước dữ liệu
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

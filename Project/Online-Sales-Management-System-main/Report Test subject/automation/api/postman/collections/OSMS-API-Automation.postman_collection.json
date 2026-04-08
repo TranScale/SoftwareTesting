@@ -1,0 +1,537 @@
+{
+  "info": {
+    "_postman_id": "6d1adf49-6a1a-4dd7-92ec-312f527af3e5",
+    "name": "OSMS API Automation",
+    "description": "Automation collection for the Online Sales Management System public API. The requests map directly to the Phase 5 API test cases and are intended to run with Newman in Phase 8 and Phase 9.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 Health Smoke",
+      "item": [
+        {
+          "name": "TC-API-HLT-001 Health endpoint returns service availability metadata",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/health"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Health payload contains expected fields', function () {",
+                  "    pm.expect(json.status).to.eql('ok');",
+                  "    pm.expect(json.service).to.be.a('string').and.not.empty;",
+                  "    pm.expect(json.serverTimeUtc).to.be.a('string').and.not.empty;",
+                  "    pm.expect(json.version).to.be.a('string').and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 Catalog Happy Path",
+      "item": [
+        {
+          "name": "TC-API-CAT-001 Catalog products endpoint returns paginated active products with default parameters",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/catalog/products?page=1&pageSize=2"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Paginated payload is returned', function () {",
+                  "    pm.expect(json.page).to.eql(1);",
+                  "    pm.expect(json.pageSize).to.eql(2);",
+                  "    pm.expect(json.totalItems).to.be.a('number');",
+                  "    pm.expect(json.totalPages).to.be.a('number');",
+                  "    pm.expect(json.items).to.be.an('array').that.is.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-CAT-002 Catalog products endpoint supports search by SKU or product name",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/catalog/products?search={{sampleSearchSku}}&page=1&pageSize=5"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "const term = pm.environment.get('sampleSearchSku');",
+                  "pm.test('Search returns matching products only', function () {",
+                  "    pm.expect(json.items).to.be.an('array').that.is.not.empty;",
+                  "    json.items.forEach(function (item) {",
+                  "        const combined = `${item.sku} ${item.name}`.toLowerCase();",
+                  "        pm.expect(combined).to.include(term.toLowerCase());",
+                  "    });",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-CAT-003 Catalog products endpoint filters by valid categoryId",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/catalog/products?categoryId={{sampleCategoryId}}&page=1&pageSize=5"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "const categoryId = Number(pm.environment.get('sampleCategoryId'));",
+                  "pm.test('Every returned item matches the requested category when items are present', function () {",
+                  "    pm.expect(json.items).to.be.an('array');",
+                  "    json.items.forEach(function (item) { pm.expect(item.categoryId).to.eql(categoryId); });",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-CAT-004 Catalog products endpoint filters by valid brandId",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/catalog/products?brandId={{sampleBrandId}}&page=1&pageSize=5"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "const brandId = Number(pm.environment.get('sampleBrandId'));",
+                  "pm.test('Every returned item matches the requested brand when items are present', function () {",
+                  "    pm.expect(json.items).to.be.an('array');",
+                  "    json.items.forEach(function (item) { pm.expect(item.brandId).to.eql(brandId); });",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-CAT-005 Catalog products endpoint supports valid price range and sort parameters",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/catalog/products?minPrice=0&maxPrice=5000000&sort=price_asc&page=1&pageSize=5"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Prices stay inside the requested range and are sorted ascending', function () {",
+                  "    pm.expect(json.items).to.be.an('array');",
+                  "    for (let i = 0; i < json.items.length; i += 1) {",
+                  "        pm.expect(json.items[i].salePrice).to.be.at.least(0);",
+                  "        pm.expect(json.items[i].salePrice).to.be.at.most(5000000);",
+                  "        if (i > 0) {",
+                  "            pm.expect(json.items[i].salePrice).to.be.at.least(json.items[i - 1].salePrice);",
+                  "        }",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 Catalog Validation And Negative",
+      "item": [
+        {
+          "name": "TC-API-CAT-006 Catalog products endpoint rejects page less than 1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/catalog/products?page=0&pageSize=5"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Validation payload targets page', function () {",
+                  "    pm.expect(json.code).to.eql('validation_error');",
+                  "    pm.expect(json.target).to.eql('page');",
+                  "    pm.expect(json.message).to.eql('Page must be greater than 0.');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-CAT-007 Catalog products endpoint rejects pageSize less than 1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/catalog/products?page=1&pageSize=0"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Validation payload targets pageSize lower bound', function () {",
+                  "    pm.expect(json.code).to.eql('validation_error');",
+                  "    pm.expect(json.target).to.eql('pageSize');",
+                  "    pm.expect(json.message).to.eql('Page size must be between 1 and 100.');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-CAT-008 Catalog products endpoint rejects pageSize greater than 100",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/catalog/products?page=1&pageSize=101"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Validation payload targets pageSize upper bound', function () {",
+                  "    pm.expect(json.code).to.eql('validation_error');",
+                  "    pm.expect(json.target).to.eql('pageSize');",
+                  "    pm.expect(json.message).to.eql('Page size must be between 1 and 100.');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-CAT-009 Catalog products endpoint rejects negative minPrice",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/catalog/products?minPrice=-1&page=1&pageSize=5"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Validation payload targets minPrice', function () {",
+                  "    pm.expect(json.code).to.eql('validation_error');",
+                  "    pm.expect(json.target).to.eql('minPrice');",
+                  "    pm.expect(json.message).to.eql('Minimum price cannot be negative.');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-CAT-010 Catalog products endpoint rejects negative maxPrice",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/catalog/products?maxPrice=-1&page=1&pageSize=5"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Validation payload targets maxPrice', function () {",
+                  "    pm.expect(json.code).to.eql('validation_error');",
+                  "    pm.expect(json.target).to.eql('maxPrice');",
+                  "    pm.expect(json.message).to.eql('Maximum price cannot be negative.');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-CAT-011 Catalog products endpoint rejects minPrice greater than maxPrice",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/catalog/products?minPrice=5000000&maxPrice=100000&page=1&pageSize=5"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Validation payload targets priceRange', function () {",
+                  "    pm.expect(json.code).to.eql('validation_error');",
+                  "    pm.expect(json.target).to.eql('priceRange');",
+                  "    pm.expect(json.message).to.eql('Minimum price cannot be greater than maximum price.');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-CAT-012 Catalog products endpoint rejects unsupported sort option",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/catalog/products?sort=popularity&page=1&pageSize=5"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Validation payload targets sort', function () {",
+                  "    pm.expect(json.code).to.eql('validation_error');",
+                  "    pm.expect(json.target).to.eql('sort');",
+                  "    pm.expect(json.message).to.include('Sort must be one of');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-CAT-013 Catalog products endpoint rejects page value that exceeds total pages",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/catalog/products?page=999&pageSize=2"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Validation payload targets page overflow', function () {",
+                  "    pm.expect(json.code).to.eql('validation_error');",
+                  "    pm.expect(json.target).to.eql('page');",
+                  "    pm.expect(json.message).to.include('Page exceeds total pages');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 Product Detail",
+      "item": [
+        {
+          "name": "TC-API-CAT-014 Catalog product detail endpoint returns expected payload for valid active product",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/catalog/products/{{sampleProductId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "const sampleProductId = Number(pm.environment.get('sampleProductId'));",
+                  "pm.test('Detail payload contains the expected schema', function () {",
+                  "    pm.expect(json.id).to.eql(sampleProductId);",
+                  "    pm.expect(json.sku).to.be.a('string').and.not.empty;",
+                  "    pm.expect(json.name).to.be.a('string').and.not.empty;",
+                  "    pm.expect(json.salePrice).to.be.a('number');",
+                  "    pm.expect(json.stockOnHand).to.be.a('number');",
+                  "    pm.expect(json.reorderLevel).to.be.a('number');",
+                  "    pm.expect(json.isTrending).to.be.a('boolean');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-CAT-015 Catalog product detail endpoint rejects id less than or equal to zero",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/catalog/products/0"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Validation payload targets id lower bound', function () {",
+                  "    pm.expect(json.code).to.eql('validation_error');",
+                  "    pm.expect(json.target).to.eql('id');",
+                  "    pm.expect(json.message).to.eql('Id must be greater than 0.');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-CAT-016 Catalog product detail endpoint returns not_found for unknown active product id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/catalog/products/{{unknownProductId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 404', function () { pm.response.to.have.status(404); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Not found payload targets id', function () {",
+                  "    pm.expect(json.code).to.eql('not_found');",
+                  "    pm.expect(json.target).to.eql('id');",
+                  "    pm.expect(json.message).to.eql('Product not found.');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "05 Trending And Filters",
+      "item": [
+        {
+          "name": "TC-API-CAT-017 Trending endpoint returns active trending categories and products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/catalog/trending"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Trending payload returns categories and products arrays', function () {",
+                  "    pm.expect(json.categories).to.be.an('array');",
+                  "    pm.expect(json.products).to.be.an('array');",
+                  "    pm.expect(json.categories.length).to.be.at.most(8);",
+                  "    pm.expect(json.products.length).to.be.at.most(8);",
+                  "    json.products.forEach(function (item) { pm.expect(item.isTrending).to.eql(true); });",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-CAT-018 Filters endpoint returns active categories and brands with product counts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/catalog/filters"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Filters payload contains category and brand lookups', function () {",
+                  "    pm.expect(json.categories).to.be.an('array').that.is.not.empty;",
+                  "    pm.expect(json.brands).to.be.an('array').that.is.not.empty;",
+                  "    json.categories.forEach(function (entry) {",
+                  "        pm.expect(entry).to.have.property('id');",
+                  "        pm.expect(entry).to.have.property('name');",
+                  "        pm.expect(entry).to.have.property('productCount');",
+                  "    });",
+                  "    json.brands.forEach(function (entry) {",
+                  "        pm.expect(entry).to.have.property('id');",
+                  "        pm.expect(entry).to.have.property('name');",
+                  "        pm.expect(entry).to.have.property('productCount');",
+                  "    });",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

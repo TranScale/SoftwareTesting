@@ -1,0 +1,74 @@
+﻿@model OnlineSalesManagementSystem.Domain.Entities.Customer
+@{
+    ViewData["Title"] = "Sửa Khách hàng";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/customers-ui.css" />
+
+<div class="container-fluid py-4" style="background-color: #f8f9fc;">
+    <div class="hero-header d-flex justify-content-between align-items-center">
+        <i class="fas fa-user-edit hero-icon-bg"></i>
+        <div style="z-index: 1;">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-custom mb-2">
+                    <li class="breadcrumb-item"><a href="/Admin/Customers">Khách hàng</a></li>
+                    <li class="breadcrumb-item active">Chỉnh sửa</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold text-dark mb-0">Cập nhật thông tin</h2>
+        </div>
+        <div style="z-index: 1;">
+            <a href="/Admin/Customers" class="btn btn-outline-secondary rounded-pill px-4"><i class="fas fa-arrow-left me-2"></i>Quay lại</a>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+            <div class="card card-modern p-4">
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert alert-danger shadow-sm border-0 rounded-3 mb-4">
+                        @Html.ValidationSummary(excludePropertyErrors: false)
+                    </div>
+                }
+
+                <form method="post" action="/Admin/Customers/Edit" class="row g-4">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="Id" value="@Model.Id" />
+
+                    <div class="col-12">
+                        <label class="form-label fw-bold text-muted">Họ và tên <span class="text-danger">*</span></label>
+                        <input class="form-control form-control-lg" name="Name" value="@Model.Name" maxlength="150" required />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-muted">Số điện thoại</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fas fa-phone-alt text-muted"></i></span>
+                            <input class="form-control" name="Phone" value="@Model.Phone" maxlength="30" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-muted">Email</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fas fa-envelope text-muted"></i></span>
+                            <input class="form-control" name="Email" value="@Model.Email" maxlength="150" type="email" />
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-bold text-muted">Địa chỉ</label>
+                        <textarea class="form-control" name="Address" rows="3" maxlength="300">@Model.Address</textarea>
+                    </div>
+
+                    <div class="col-12 d-flex justify-content-end gap-3 mt-4">
+                        <a href="/Admin/Customers" class="btn btn-light rounded-pill px-4">Hủy bỏ</a>
+                        <button type="submit" class="btn btn-gradient rounded-pill px-5 shadow fw-bold">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

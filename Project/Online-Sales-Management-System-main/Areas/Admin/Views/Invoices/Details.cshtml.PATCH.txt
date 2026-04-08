@@ -1,0 +1,80 @@
+/*
+APPLY TO: Areas/Admin/Views/Invoices/Details.cshtml
+
+1) Replace the customer line in the "Chi tiết sản phẩm" section with the HTML block below.
+2) Add the @section Scripts block (or merge into existing one).
+NOTE: This requires endpoint: GET /Admin/Customers/QuickInfo/{id}
+*/
+
+@{
+    var c = Model.Customer;
+}
+
+<div class="d-flex align-items-center gap-2">
+    <span class="text-muted small">Khách hàng:</span>
+
+    @if (c != null)
+    {
+        <a href="/Admin/Customers/Details/@c.Id"
+           id="invoiceCustomerLink"
+           class="fw-semibold text-decoration-none"
+           data-id="@c.Id">
+            @c.Name
+        </a>
+    }
+    else
+    {
+        <span class="text-muted">Khách lẻ</span>
+    }
+</div>
+
+<div id="invoiceCustomerHoverCard" class="customer-hover-card">
+    <div class="customer-pop-arrow"></div>
+    <div class="customer-pop-title" id="ihName"></div>
+    <div class="customer-pop-row" id="ihPhone"></div>
+    <div class="customer-pop-row" id="ihEmail"></div>
+    <div class="customer-pop-row" id="ihAddress"></div>
+</div>
+
+@section Scripts{
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const link = document.getElementById('invoiceCustomerLink');
+  const card = document.getElementById('invoiceCustomerHoverCard');
+  if (!link || !card) return;
+
+  const id = link.dataset.id;
+  const n = document.getElementById('ihName');
+  const p = document.getElementById('ihPhone');
+  const e = document.getElementById('ihEmail');
+  const a = document.getElementById('ihAddress');
+
+  async function load() {
+    const r = await fetch(`/Admin/Customers/QuickInfo/${id}`);
+    if (!r.ok) return;
+    const d = await r.json();
+    n.textContent = d.name || '';
+    p.innerHTML = d.phone ? `<b>📞</b> ${d.phone}` : '';
+    e.innerHTML = d.email ? `<b>✉️</b> ${d.email}` : '';
+    a.innerHTML = d.address ? `<b>📍</b> ${d.address}` : '';
+  }
+
+  function place() {
+    const r = link.getBoundingClientRect();
+    card.style.left = Math.min(r.left, window.innerWidth - card.offsetWidth - 12) + 'px';
+    card.style.top = (r.bottom + 8) + 'px';
+  }
+
+  let loaded = false, t;
+  link.addEventListener('mouseenter', async () => {
+    clearTimeout(t);
+    card.style.display = 'block';
+    place();
+    if (!loaded) { await load(); loaded = true; }
+  });
+  link.addEventListener('mouseleave', () => t = setTimeout(() => card.style.display = 'none', 150));
+  card.addEventListener('mouseenter', () => clearTimeout(t));
+  card.addEventListener('mouseleave', () => t = setTimeout(() => card.style.display = 'none', 150));
+});
+</script>
+}

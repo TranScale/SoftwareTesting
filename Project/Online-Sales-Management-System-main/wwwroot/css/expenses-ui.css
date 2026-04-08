@@ -1,0 +1,144 @@
+﻿/* File: wwwroot/css/expenses-ui.css */
+
+/* --- 1. Hero Header (Theme Ruby Red) --- */
+.hero-header {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    border: 1px solid rgba(0,0,0,0.02);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+    .hero-header::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 6px;
+        /* Gradient Đỏ Ruby */
+        background: linear-gradient(180deg, #d31027 0%, #ea384d 100%);
+    }
+
+.hero-icon-bg {
+    position: absolute;
+    right: -20px;
+    bottom: -20px;
+    font-size: 8rem;
+    color: rgba(0,0,0,0.03);
+    transform: rotate(-15deg);
+    pointer-events: none;
+}
+
+/* Breadcrumb & Stats */
+.breadcrumb-custom {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+    .breadcrumb-custom a {
+        color: #6c757d;
+        text-decoration: none;
+    }
+
+        .breadcrumb-custom a:hover {
+            color: #ea384d;
+        }
+
+    .breadcrumb-custom .active {
+        color: #a0aec0;
+    }
+
+.stat-badge {
+    background: rgba(234, 56, 77, 0.1);
+    color: #ea384d;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* --- 2. Card & Table --- */
+.card-modern {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    background: #ffffff;
+    overflow: hidden;
+}
+
+.table-modern thead th {
+    background-color: #fff5f5; /* Nền đỏ rất nhạt */
+    color: #5a5c69;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    border-bottom: 2px solid #fed7d7;
+    padding: 1.2rem 1rem;
+}
+
+.table-modern tbody td {
+    vertical-align: middle;
+    padding: 1rem;
+    color: #343a40;
+    border-bottom: 1px solid #f1f3f5;
+    font-size: 0.95rem;
+}
+
+.table-modern tbody tr:hover {
+    background-color: #fffaf9;
+    transition: all 0.2s ease;
+}
+
+/* --- 3. Buttons --- */
+.btn-gradient {
+    background: linear-gradient(135deg, #d31027 0%, #ea384d 100%);
+    border: none;
+    color: white;
+    transition: all 0.2s;
+}
+
+    .btn-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(211, 16, 39, 0.4);
+        color: white;
+    }
+
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid #e3e6f0;
+    color: #6e707e;
+    transition: all 0.2s;
+}
+
+    .btn-icon:hover {
+        border-color: transparent;
+        color: #fff;
+    }
+
+    .btn-icon.edit:hover {
+        background: #ea384d;
+        box-shadow: 0 4px 10px rgba(234, 56, 77, 0.3);
+    }
+
+    .btn-icon.delete:hover {
+        background: #333;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }

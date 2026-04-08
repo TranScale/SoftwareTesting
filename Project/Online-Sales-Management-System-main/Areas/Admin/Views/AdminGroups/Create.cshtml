@@ -1,0 +1,51 @@
+@model OnlineSalesManagementSystem.Domain.Entities.AdminGroup
+@{
+    ViewData["Title"] = "Create Group";
+}
+
+<div class="card card-primary">
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-plus mr-1"></i> Create Group</h3>
+        <div class="card-tools">
+            <a class="btn btn-tool" href="/Admin/AdminGroups" data-toggle="tooltip" title="Back"><i class="fas fa-arrow-left"></i></a>
+        </div>
+    </div>
+
+    <div class="card-body">
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                @Html.ValidationSummary(excludePropertyErrors: true)
+            </div>
+        }
+
+        <form method="post" action="/Admin/AdminGroups/Create">
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <label asp-for="Name">Name <span class="text-danger">*</span></label>
+                <input class="form-control" asp-for="Name" maxlength="120" required />
+                <span class="text-danger small" asp-validation-for="Name"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Description">Description</label>
+                <textarea class="form-control" asp-for="Description" rows="3"></textarea>
+                <span class="text-danger small" asp-validation-for="Description"></span>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i> Create</button>
+                <a class="btn btn-default" href="/Admin/AdminGroups">Cancel</a>
+            </div>
+
+            <div class="alert alert-info mt-3 mb-0">
+                After creating the group, open <b>Permissions</b> to configure module access.
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

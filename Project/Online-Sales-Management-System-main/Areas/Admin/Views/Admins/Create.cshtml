@@ -1,0 +1,84 @@
+@model OnlineSalesManagementSystem.Areas.Admin.Controllers.AdminsController.AdminCreateVm
+@using OnlineSalesManagementSystem.Domain.Entities
+@{
+    ViewData["Title"] = "Create Admin";
+    var groups = ViewBag.Groups as List<AdminGroup> ?? new();
+}
+
+<div class="card card-primary">
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-user-plus mr-1"></i> Create Admin</h3>
+        <div class="card-tools">
+            <a class="btn btn-tool" href="/Admin/Admins" data-toggle="tooltip" title="Back"><i class="fas fa-arrow-left"></i></a>
+        </div>
+    </div>
+
+    <form asp-area="Admin" asp-controller="Admins" asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+        <div class="card-body">
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+                    @Html.ValidationSummary(excludePropertyErrors: true)
+                </div>
+            }
+
+            <div class="row">
+                <div class="col-12 col-lg-6">
+                    <div class="form-group">
+                        <label>Email <span class="text-danger">*</span></label>
+                        <input class="form-control" name="Email" value="@Model.Email" type="email" required maxlength="150" />
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-6">
+                    <div class="form-group">
+                        <label>Full name</label>
+                        <input class="form-control" name="FullName" value="@Model.FullName" maxlength="150" />
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-6">
+                    <div class="form-group">
+                        <label>Password <span class="text-danger">*</span></label>
+                        <input class="form-control" name="Password" value="@Model.Password" type="password" required />
+                        <small class="text-muted">Suggested: <code>Admin@12345</code></small>
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-6">
+                    <div class="form-group">
+                        <label>Group</label>
+                        <select class="form-control" name="AdminGroupId">
+                            <option value="">-- None --</option>
+                            @foreach (var g in groups)
+                            {
+                                var selected = (Model.AdminGroupId == g.Id) ? "selected" : null;
+                                <option value="@g.Id" selected="@selected">@g.Name</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-group mb-0">
+                        <div class="icheck-primary d-inline">
+                            <input type="hidden" name="IsActive" value="false" />
+                            <input type="checkbox" id="isActive" name="IsActive" value="true" @(Model.IsActive ? "checked" : "") />
+                            <label for="isActive">Active</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer d-flex justify-content-between">
+            <a class="btn btn-default" href="/Admin/Admins"><i class="fas fa-times mr-1"></i> Cancel</a>
+            <button class="btn btn-primary" type="submit"><i class="fas fa-save mr-1"></i> Create</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

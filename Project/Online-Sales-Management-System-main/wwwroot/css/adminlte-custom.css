@@ -1,0 +1,132 @@
+﻿/* --- Modern Navbar & Footer Styles --- */
+
+/* 1. Glassmorphism Header */
+.main-header {
+    background: rgba(255, 255, 255, 0.95) !important; /* Nền trắng mờ */
+    backdrop-filter: blur(12px); /* Hiệu ứng kính */
+    border-bottom: none !important;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03); /* Bóng đổ rất nhẹ */
+    transition: all 0.3s;
+}
+
+    /* Link trong menu */
+    .main-header .nav-link {
+        color: #555 !important;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+
+        .main-header .nav-link:hover {
+            background-color: rgba(0, 0, 0, 0.03);
+            color: #007bff !important; /* Màu xanh khi hover */
+        }
+
+/* 2. User Dropdown đẹp hơn */
+.user-dropdown-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    text-align: center;
+    border-radius: 10px 10px 0 0;
+}
+
+.dropdown-menu-lg {
+    border: none;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* 3. Footer hiện đại */
+.main-footer {
+    background: #fff;
+    border-top: none;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.03);
+    padding: 1.5rem;
+    color: #6c757d;
+    font-size: 0.9rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-link {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+    .footer-link:hover {
+        text-decoration: underline;
+    }
+
+/* --- MODERN SIDEBAR STYLES --- */
+
+/* 1. Nền Sidebar tối màu hiện đại (Deep Blue-Grey) */
+.main-sidebar {
+    background-color: #1e1e2d !important;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+}
+
+/* 2. Logo Brand */
+.brand-link {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    background-color: #1a1a27 !important;
+}
+
+/* 3. Style cho từng mục Menu */
+.nav-sidebar .nav-item {
+    margin-bottom: 5px;
+}
+
+.nav-sidebar .nav-link {
+    border-radius: 8px !important; /* Bo góc mềm mại */
+    color: #a2a3b7 !important; /* Màu chữ xám sáng */
+    transition: all 0.3s ease;
+    padding: 10px 15px;
+    font-weight: 500;
+}
+
+    /* Hiệu ứng khi di chuột (Hover) */
+    .nav-sidebar .nav-link:hover {
+        background-color: rgba(255, 255, 255, 0.08) !important;
+        color: #ffffff !important;
+        padding-left: 20px; /* Trượt nhẹ sang phải */
+    }
+
+        .nav-sidebar .nav-link:hover i {
+            color: #3699ff; /* Icon đổi màu xanh */
+        }
+
+/* 4. Trạng thái đang chọn (Active) - Gradient Xanh Dương */
+.nav-sidebar > .nav-item > .nav-link.active {
+    background: linear-gradient(135deg, #3699ff 0%, #007bff 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4) !important; /* Đổ bóng phát sáng */
+    font-weight: 600;
+}
+
+/* Icon của menu đang chọn */
+.nav-sidebar .nav-link.active i {
+    color: #ffffff !important;
+}
+
+/* 5. Header phân cách (VD: REPORT, SETTINGS) */
+.nav-header {
+    color: #5e6278 !important;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    padding: 1.5rem 1rem 0.5rem 1rem;
+}
+
+/* 6. Icon Sidebar căn chỉnh lại */
+.nav-sidebar .nav-icon {
+    width: 24px;
+    text-align: center;
+    margin-right: 10px;
+    font-size: 1.1rem;
+    transition: color 0.3s;
+}

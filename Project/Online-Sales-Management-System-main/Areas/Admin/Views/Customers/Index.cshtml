@@ -1,0 +1,196 @@
+@model List<OnlineSalesManagementSystem.Domain.Entities.Customer>
+@using Microsoft.AspNetCore.Authorization
+@using OnlineSalesManagementSystem.Services.Security
+@inject IAuthorizationService AuthorizationService
+@{
+    ViewData["Title"] = "Quản Lý Khách Hàng";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    string q = ViewBag.Query as string ?? "";
+    int page = (int)(ViewBag.Page ?? 1);
+    int pageSize = (int)(ViewBag.PageSize ?? 10);
+    int total = (int)(ViewBag.Total ?? 0);
+
+    int totalPages = pageSize <= 0 ? 0 : (int)Math.Ceiling(total / (double)pageSize);
+    bool hasPrev = page > 1;
+    bool hasNext = page < totalPages;
+    int start = (page - 1) * pageSize + (total == 0 ? 0 : 1);
+    int end = Math.Min(page * pageSize, total);
+
+    // Permission Logic
+    string pCreate = PermissionConstants.PolicyPrefix + PermissionConstants.Modules.Customers + "." + PermissionConstants.Actions.Create;
+    string pEdit = PermissionConstants.PolicyPrefix + PermissionConstants.Modules.Customers + "." + PermissionConstants.Actions.Edit;
+    string pDelete = PermissionConstants.PolicyPrefix + PermissionConstants.Modules.Customers + "." + PermissionConstants.Actions.Delete;
+
+    bool canCreate = (await AuthorizationService.AuthorizeAsync(User, pCreate)).Succeeded;
+    bool canEdit = (await AuthorizationService.AuthorizeAsync(User, pEdit)).Succeeded;
+    bool canDelete = (await AuthorizationService.AuthorizeAsync(User, pDelete)).Succeeded;
+
+    string BuildUrl(int p)
+    {
+        return Url.Action("Index", "Customers", new { area = "Admin", q = q, page = p, pageSize = pageSize }) ?? $"/Admin/Customers?q={q}&page={p}&pageSize={pageSize}";
+    }
+}
+
+<link rel="stylesheet" href="~/css/customers-ui.css" asp-append-version="true" />
+
+<div class="container-fluid py-4" style="background-color: #f8f9fc;">
+    <div class="hero-header">
+        <i class="fas fa-users hero-icon-bg"></i>
+
+        <div class="d-flex justify-content-between align-items-center position-relative" style="z-index: 1;">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-custom mb-2">
+                        <li class="breadcrumb-item"><a href="/Admin/Dashboard">Dashboard</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Kh&#225;ch h&#224;ng</li>
+                    </ol>
+                </nav>
+
+                <h2 class="fw-bold text-dark mb-1">Danh s&#225;ch kh&#225;ch h&#224;ng</h2>
+                <div class="text-muted">Qu&#7843;n l&#253; th&#244;ng tin li&#234;n h&#7879; v&#224; l&#7883;ch s&#7917; giao d&#7883;ch c&#7911;a kh&#225;ch h&#224;ng.</div>
+            </div>
+
+            @if (canCreate)
+            {
+                <a class="btn btn-primary btn-add rounded-pill px-4" href="/Admin/Customers/Create">
+                    <i class="fas fa-plus me-2"></i>Th&#234;m kh&#225;ch h&#224;ng
+                </a>
+            }
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4">
+            <form method="get" class="row g-2 align-items-center mb-3">
+                <div class="col-12 col-md-6">
+                    <div class="input-group search-bar">
+                        <span class="input-group-text bg-white border-0"><i class="fas fa-search"></i></span>
+                        <input type="text" name="q" value="@q" class="form-control border-0" placeholder="T&#236;m t&#234;n, email, s&#7889; &#273;i&#7879;n tho&#7841;i..." />
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-2">
+                    <select class="form-select select-per-page" name="pageSize">
+                        <option value="10" selected="@(pageSize == 10)">10 d&#242;ng</option>
+                        <option value="20" selected="@(pageSize == 20)">20 d&#242;ng</option>
+                        <option value="50" selected="@(pageSize == 50)">50 d&#242;ng</option>
+                        <option value="100" selected="@(pageSize == 100)">100 d&#242;ng</option>
+                    </select>
+                </div>
+
+                <div class="col-6 col-md-4 d-flex justify-content-end gap-2">
+                    <a class="btn btn-outline-secondary btn-reset" href="/Admin/Customers">
+                        <i class="fas fa-undo me-2"></i>Reset
+                    </a>
+                    <button class="btn btn-primary btn-search" type="submit">
+                        <i class="fas fa-search me-2"></i>T&#236;m ki&#7871;m
+                    </button>
+                </div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">H&#7885; v&#224; t&#234;n</th>
+                            <th>S&#7889; &#273;i&#7879;n tho&#7841;i</th>
+                            <th>Email</th>
+                            <th>&#272;&#7883;a ch&#7881;</th>
+                            <th>Ng&#224;y t&#7841;o</th>
+                            <th class="text-end pe-4">H&#224;nh &#273;&#7897;ng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model == null || Model.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="fas fa-user-slash fa-2x mb-2"></i>
+                                    <div class="fw-bold">Kh&#244;ng c&#243; kh&#225;ch h&#224;ng n&#224;o</div>
+                                    <div class="small">H&#227;y th&#7917; &#273;&#7893;i t&#7915; kh&#243;a t&#236;m ki&#7871;m ho&#7863;c th&#234;m m&#7899;i.</div>
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var c in Model)
+                            {
+                                var initial = !string.IsNullOrEmpty(c.Name) ? c.Name.Substring(0, 1).ToUpperInvariant() : "?";
+
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle">@initial</div>
+                                            <div>
+                                                <div class="fw-bold text-dark">@c.Name</div>
+                                                <div class="small text-muted">ID: #@c.Id</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-dark fw-semibold">@c.Phone</td>
+                                    <td class="text-muted">@c.Email</td>
+                                    <td class="text-muted text-truncate" style="max-width: 240px;" title="@c.Address">@c.Address</td>
+                                    <td class="text-muted small">@c.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                                    <td class="text-end pe-4">
+                                        <a href="/Admin/Customers/Details/@c.Id" class="btn btn-icon view me-2" title="Chi ti&#7871;t">
+                                            <i class="fas fa-eye fa-xs"></i>
+                                        </a>
+
+                                        @if (canEdit)
+                                        {
+                                            <a href="/Admin/Customers/Edit/@c.Id" class="btn btn-icon edit me-2" title="S&#7917;a">
+                                                <i class="fas fa-pen fa-xs"></i>
+                                            </a>
+                                        }
+
+                                        @if (canDelete)
+                                        {
+                                            <form method="post" action="/Admin/Customers/Delete/@c.Id" class="d-inline"
+                                                  onsubmit="return confirm('B&#7841;n c&#243; ch&#7855;c ch&#7855;n mu&#7889;n x&#243;a kh&#225;ch h&#224;ng n&#224;y?');">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-icon delete" title="X&#243;a">
+                                                    <i class="fas fa-trash fa-xs"></i>
+                                                </button>
+                                            </form>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        @if (total > 0)
+        {
+            <div class="card-footer bg-white border-top-0 d-flex align-items-center justify-content-between py-3 px-4">
+                <div class="text-muted small">Hi&#7875;n th&#7883; @start - @end trong @total kh&#225;ch h&#224;ng</div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0 shadow-sm">
+                        <li class="page-item @(hasPrev ? "" : "disabled")">
+                            <a class="page-link rounded-start" href="@BuildUrl(page - 1)">Tr&#432;&#7899;c</a>
+                        </li>
+
+                        @{
+                            // show up to 5 pages around current
+                            int from = Math.Max(1, page - 2);
+                            int to = Math.Min(totalPages, page + 2);
+                            for (int p = from; p <= to; p++)
+                            {
+                                <li class="page-item @(p == page ? "active" : "")">
+                                    <a class="page-link" href="@BuildUrl(p)">@p</a>
+                                </li>
+                            }
+                        }
+
+                        <li class="page-item @(hasNext ? "" : "disabled")">
+                            <a class="page-link rounded-end" href="@BuildUrl(page + 1)">Sau</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        }
+    </div>
+</div>

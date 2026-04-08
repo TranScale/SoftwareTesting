@@ -1,0 +1,273 @@
+@model OnlineSalesManagementSystem.Areas.Admin.ViewModels.Customers.CustomerDetailsVm
+@using OnlineSalesManagementSystem.Domain.Entities
+@{
+    ViewData["Title"] = "Chi Tiết Khách Hàng";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    var c = Model.Customer;
+
+    string initial = "?";
+    if (!string.IsNullOrWhiteSpace(c.Name))
+    {
+        initial = c.Name.Trim().Substring(0, 1).ToUpperInvariant();
+    }
+
+    string FormatMoney(decimal v) => string.Format(System.Globalization.CultureInfo.GetCultureInfo("vi-VN"), "{0:n0}", v);
+    string StatusText(InvoiceStatus s) => s switch
+    {
+        InvoiceStatus.Draft => "Nh&#225;p",
+        InvoiceStatus.Unpaid => "Ch&#432;a thanh to&#225;n",
+        InvoiceStatus.PartiallyPaid => "Thanh to&#225;n m&#7897;t ph&#7847;n",
+        InvoiceStatus.Paid => "&#272;&#227; thanh to&#225;n",
+        InvoiceStatus.Cancelled => "&#272;&#227; h&#7911;y",
+        _ => s.ToString()
+    };
+
+    string StatusCss(InvoiceStatus s) => s switch
+    {
+        InvoiceStatus.Paid => "badge-paid",
+        InvoiceStatus.Unpaid => "badge-unpaid",
+        InvoiceStatus.PartiallyPaid => "badge-partial",
+        InvoiceStatus.Cancelled => "badge-cancel",
+        InvoiceStatus.Draft => "badge-draft",
+        _ => "badge-cancel"
+    };
+}
+
+<link rel="stylesheet" href="~/css/customers-ui.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/customer-details.css" asp-append-version="true" />
+
+<div class="container-fluid py-4 customer-details-page" style="background-color: #f8f9fc;">
+    <div class="hero-header">
+        <i class="fas fa-user-tag hero-icon-bg"></i>
+
+        <div class="d-flex justify-content-between align-items-center position-relative" style="z-index: 1;">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-custom mb-2">
+                        <li class="breadcrumb-item"><a href="/Admin/Dashboard">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="/Admin/Customers">Kh&#225;ch h&#224;ng</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Chi ti&#7871;t</li>
+                    </ol>
+                </nav>
+
+                <h2 class="fw-bold text-dark mb-1">Chi ti&#7871;t kh&#225;ch h&#224;ng</h2>
+                <div class="text-muted">Xem th&#244;ng tin v&#224; l&#7883;ch s&#7917; &#273;&#417;n h&#224;ng m&#7897;t c&#225;ch nhanh ch&#243;ng.</div>
+            </div>
+
+            <a href="/Admin/Customers" class="btn btn-outline-secondary rounded-pill px-4">
+                <i class="fas fa-arrow-left me-2"></i>Quay l&#7841;i
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-12 col-xl-4">
+            <div class="card card-modern p-4 h-100">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="customer-avatar">@initial</div>
+                    <div class="flex-grow-1">
+                        <div class="h5 fw-bold mb-1">@c.Name</div>
+                        <div class="text-muted small">
+                            ID: #@c.Id
+                            <span class="mx-2">&#8226;</span>
+                            T&#7841;o: @c.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                        </div>
+                    </div>
+                </div>
+
+                <div class="customer-info-list">
+                    <div class="info-row">
+                        <div class="label"><i class="fas fa-phone-alt me-2"></i>S&#7889; &#273;i&#7879;n tho&#7841;i</div>
+                        <div class="value">@(!string.IsNullOrWhiteSpace(c.Phone) ? c.Phone : "-")</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="label"><i class="fas fa-envelope me-2"></i>Email</div>
+                        <div class="value">@(!string.IsNullOrWhiteSpace(c.Email) ? c.Email : "-")</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="label"><i class="fas fa-map-marker-alt me-2"></i>&#272;&#7883;a ch&#7881;</div>
+                        <div class="value">@(!string.IsNullOrWhiteSpace(c.Address) ? c.Address : "-")</div>
+                    </div>
+                </div>
+
+                <div class="mt-3 pt-3 border-top">
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-light text-dark border">
+                            <i class="fas fa-receipt me-1"></i>@Model.TotalOrders &#273;&#417;n
+                        </span>
+                        <span class="badge bg-light text-dark border">
+                            <i class="fas fa-coins me-1"></i>T&#7893;ng chi: @FormatMoney(Model.TotalSpent) &#8363;
+                        </span>
+                        <span class="badge bg-light text-dark border">
+                            <i class="fas fa-exclamation-circle me-1"></i>C&#242;n n&#7907;: @FormatMoney(Model.TotalOutstanding) &#8363;
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-8">
+            <div class="row g-4">
+                <div class="col-12">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-4">
+                            <div class="stat-card">
+                                <div class="stat-title">T&#7893;ng chi ti&#234;u</div>
+                                <div class="stat-value">@FormatMoney(Model.TotalSpent) <span class="text-muted" style="font-size: 0.9rem;">&#8363;</span></div>
+                                <div class="stat-sub">&#272;&#227; mua (kh&#244;ng t&#237;nh &#273;&#227; h&#7911;y)</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="stat-card">
+                                <div class="stat-title">&#272;&#227; thanh to&#225;n</div>
+                                <div class="stat-value">@FormatMoney(Model.TotalPaid) <span class="text-muted" style="font-size: 0.9rem;">&#8363;</span></div>
+                                <div class="stat-sub">T&#7893;ng s&#7889; ti&#7873;n &#273;&#227; tr&#7843;</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="stat-card">
+                                <div class="stat-title">C&#242;n n&#7907;</div>
+                                <div class="stat-value">@FormatMoney(Model.TotalOutstanding) <span class="text-muted" style="font-size: 0.9rem;">&#8363;</span></div>
+                                <div class="stat-sub">T&#7893;ng c&#244;ng n&#7907; hi&#7879;n t&#7841;i</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="card card-modern">
+                        <div class="card-header bg-white border-0 p-4 pb-0">
+                            <div class="d-flex flex-wrap gap-2 justify-content-between align-items-start">
+                                <div>
+                                    <h5 class="fw-bold mb-1">L&#7883;ch s&#7917; &#273;&#417;n h&#224;ng</h5>
+                                    <div class="text-muted small">T&#236;m nhanh theo m&#227; &#273;&#417;n, tr&#7841;ng th&#225;i, ho&#7863;c s&#7843;n ph&#7849;m.</div>
+                                </div>
+
+                                <div class="d-flex flex-wrap gap-2">
+                                    <div class="input-group input-group-sm search-pill" style="width: 220px;">
+                                        <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
+                                        <input id="orderSearch" type="text" class="form-control" placeholder="T&#236;m ki&#7871;m..." />
+                                    </div>
+
+                                    <select id="statusFilter" class="form-select form-select-sm filter-pill" style="width: 190px;">
+                                        <option value="">T&#7845;t c&#7843; tr&#7841;ng th&#225;i</option>
+                                        <option value="Draft">Nh&#225;p</option>
+                                        <option value="Unpaid">Ch&#432;a thanh to&#225;n</option>
+                                        <option value="PartiallyPaid">Thanh to&#225;n m&#7897;t ph&#7847;n</option>
+                                        <option value="Paid">&#272;&#227; thanh to&#225;n</option>
+                                        <option value="Cancelled">&#272;&#227; h&#7911;y</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body p-4">
+                            @if (Model.Orders == null || Model.Orders.Count == 0)
+                            {
+                                <div class="empty-state">
+                                    <div class="mb-2"><i class="fas fa-receipt fa-2x"></i></div>
+                                    <div class="fw-bold">Ch&#432;a c&#243; &#273;&#417;n h&#224;ng n&#224;o</div>
+                                    <div class="small">Kh&#225;ch h&#224;ng n&#224;y ch&#432;a ph&#225;t sinh giao d&#7883;ch.</div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0" id="ordersTable">
+                                        <thead class="bg-light">
+                                            <tr>
+                                                <th>M&#227; &#273;&#417;n</th>
+                                                <th>Ng&#224;y l&#7853;p</th>
+                                                <th>Tr&#7841;ng th&#225;i</th>
+                                                <th class="text-center">SL</th>
+                                                <th class="text-end">T&#7893;ng ti&#7873;n</th>
+                                                <th class="text-end">&#272;&#227; tr&#7843;</th>
+                                                <th class="text-end">C&#242;n l&#7841;i</th>
+                                                <th class="text-end">Xem</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var o in Model.Orders)
+                                            {
+                                                <tr data-status="@o.Status" data-search="@((o.InvoiceNo + " " + o.ProductPreview).ToLowerInvariant())">
+                                                    <td class="fw-bold text-dark">@o.InvoiceNo</td>
+                                                    <td class="text-muted">@o.InvoiceDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                                                    <td>
+                                                        <span class="badge-status @StatusCss(o.Status)">
+                                                            <i class="fas fa-circle" style="font-size: 6px;"></i>
+                                                            @Html.Raw(StatusText(o.Status))
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-center">@o.ItemCount</td>
+                                                    <td class="text-end fw-semibold">@FormatMoney(o.GrandTotal) &#8363;</td>
+                                                    <td class="text-end text-muted">@FormatMoney(o.PaidAmount) &#8363;</td>
+                                                    <td class="text-end @(o.Balance > 0 ? "text-danger fw-semibold" : "text-muted")">@FormatMoney(o.Balance) &#8363;</td>
+                                                    <td class="text-end">
+                                                        <a class="btn btn-sm btn-outline-primary rounded-pill px-3"
+                                                           href="/Admin/Invoices/Details/@o.Id"
+                                                           title="Xem chi ti&#7871;t &#273;&#417;n h&#224;ng">
+                                                            <i class="fas fa-external-link-alt me-1"></i>Xem
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                @if (Model.LastOrder != null)
+                {
+                    <div class="col-12">
+                        <div class="card card-modern p-4">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="text-muted small">&#272;&#417;n g&#7847;n nh&#7845;t</div>
+                                    <div class="fw-bold">@Model.LastOrder.InvoiceNo</div>
+                                    <div class="text-muted small">@Model.LastOrder.InvoiceDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</div>
+                                </div>
+                                <a class="btn btn-outline-secondary rounded-pill px-4" href="/Admin/Invoices/Details/@Model.LastOrder.Id">
+                                    <i class="fas fa-receipt me-2"></i>M&#7903; &#273;&#417;n
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        (function () {
+            const searchInput = document.getElementById("orderSearch");
+            const statusFilter = document.getElementById("statusFilter");
+            const table = document.getElementById("ordersTable");
+            if (!table) return;
+
+            const rows = Array.from(table.querySelectorAll("tbody tr"));
+
+            function applyFilter() {
+                const q = (searchInput.value || "").trim().toLowerCase();
+                const st = (statusFilter.value || "").trim();
+
+                rows.forEach(r => {
+                    const rowStatus = (r.getAttribute("data-status") || "").trim();
+                    const rowSearch = (r.getAttribute("data-search") || "");
+                    const okQ = !q || rowSearch.includes(q);
+                    const okSt = !st || rowStatus === st;
+                    r.style.display = (okQ && okSt) ? "" : "none";
+                });
+            }
+
+            searchInput && searchInput.addEventListener("input", applyFilter);
+            statusFilter && statusFilter.addEventListener("change", applyFilter);
+        })();
+    </script>
+}
