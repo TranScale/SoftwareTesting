@@ -25,7 +25,7 @@ namespace StockTest
                 LoginTest.PerformLogin(driver);
                 //StockIndexTest.RunAllTests(driver);
                 //PurchaseTest.RunAllTests(driver);
-                //SupplierTest.RunAllTests(driver);
+                SupplierTest.RunAllTests(driver);
 
                 //================
                 //Lê Thị Thúy Nhi]
@@ -35,9 +35,9 @@ namespace StockTest
                 //================
                 //Nguyễn Bá Thịnh]
                 //================
-                CategoryTest.RunAllTests(driver);
-                UnitTest.RunAllTests(driver);
-                BrandTest.RunAllTests(driver);
+                // CategoryTest.RunAllTests(driver);
+                // UnitTest.RunAllTests(driver);
+                // BrandTest.RunAllTests(driver);
 
                 Console.WriteLine("\n=== ĐÃ HOÀN THÀNH TOÀN BỘ TEST CASES ===");
             }
